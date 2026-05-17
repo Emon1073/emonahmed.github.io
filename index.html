@@ -404,7 +404,6 @@ body.viewer-mode .proj-img-area::after{content:'📊';font-size:2.5rem;position:
   border-radius:var(--r);padding:1.5rem;margin-bottom:2rem;
   display:none;
 }
-.compose.owner-visible{display:block;}
 .compose-head{display:flex;align-items:center;gap:.9rem;margin-bottom:1rem;}
 .avatar{
   width:38px;height:38px;border-radius:50%;flex-shrink:0;
@@ -648,10 +647,9 @@ footer p{font-size:.78rem;color:var(--muted2);}
     </div>
     <h1>
       Emon Ahmed
-    
     </h1>
     <p class="hero-sub">
-      As an Data Specialist I design and build the infrastructure that turns raw data into reliable insight —
+      As a Data Specilist I design and build the infrastructure that turns raw data into reliable insight —
       pipelines, warehouses, streams, and everything in between.
     </p>
     <div class="hero-cta">
@@ -707,13 +705,13 @@ footer p{font-size:.78rem;color:var(--muted2);}
   <div class="about-grid reveal">
     <div class="photo-wrap">
       <div class="photo-zone" id="photoZone" onclick="ownerAction(function(){document.getElementById('photoInput').click()})">
-        <div class="ui">📸</div>
-        <p><img src="img.jpg" alt="" width="350" height="500"></p>
+        <div class="ui"></div>
+        <p><img src="img.jpg" alt="" width="250" height="500"></p>
         <small>JPG · PNG · WEBP</small>
         <img id="photoDisplay" src="" alt="Emon Ahmed"/>
       </div>
       <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="uploadPhoto(event)"/>
-      
+      <div class="photo-badge">Data Engineer </div>
     </div>
     <div class="about-right">
       <p class="sec-label">About Me</p>
@@ -779,7 +777,7 @@ footer p{font-size:.78rem;color:var(--muted2);}
       <div class="cv-item">
         <div class="cv-item-title">Junior Data Analyst (Part-Time)</div>
         <div class="cv-item-org">Freelance / Remote</div>
-        <div class="cv-item-date">Jan 2023 – May 2024</div>
+        <div class="cv-item-date">Jan 2023 – </div>
         <div class="cv-item-desc">
           <ul>
             <li>Automated weekly reporting pipelines for 3 SME clients using Python + PostgreSQL</li>
@@ -812,18 +810,18 @@ footer p{font-size:.78rem;color:var(--muted2);}
       <h3>Education</h3>
 	  
 	  <div class="cv-item">
-        <div class="cv-item-title">BSc Infotronic Systems Engineering</div>
-        <div class="cv-item-org">Rhine Waal University of Applied Science </div>
-        <div class="cv-item-date">2023 – Present </div>
+        <div class="cv-item-title">BSc In Infotronic System Engineering</div>
+        <div class="cv-item-org">Rhine Waal Univeristy of Applied Science</div>
+        <div class="cv-item-date">2023-Present</div>
         <div class="cv-item-desc">
           Relevant coursework: Databases, Distributed Systems, Algorithms, Cloud Computing, Machine Learning, Big Data Systems.
         </div>
       </div>
 
       <div class="cv-item">
-        <div class="cv-item-title">BSc Computer Science And Engineering (CSE)</div>
-        <div class="cv-item-org">University of Information Technology And Science (UITS)</div>
-        <div class="cv-item-date">2020 – 2022 </div>
+        <div class="cv-item-title">BSc In Computer Science And Engineering (CSE)</div>
+        <div class="cv-item-org">University oof Information Technology And Science (UITS)</div>
+        <div class="cv-item-date">2020-2022</div>
         <div class="cv-item-desc">
           Relevant coursework: Databases, Distributed Systems, Algorithms, Cloud Computing, Machine Learning, Big Data Systems.
         </div>
@@ -831,21 +829,21 @@ footer p{font-size:.78rem;color:var(--muted2);}
 
       <div class="cv-item">
         <div class="cv-item-title">Higher Secondary Certificate (HSC)</div>
-        <div class="cv-item-date">2015 – 2017 </div>
+        <div class="cv-item-date">2015-2017 </div>
       </div>
 
       <h3 style="margin-top:2rem;">Achievements</h3>
 
       <div class="cv-item">
-        <div class="cv-item-title">National Data Engineering Hackathon</div>
+        <div class="cv-item-title"> National Data Engineering Hackathon</div>
         <div class="cv-item-org">BD Tech Council</div>
-        <div class="cv-item-date">2020</div>
+        <div class="cv-item-date">2024</div>
         <div class="cv-item-desc">Built a real-time fraud detection pipeline in 24h using Kafka + Flink.</div>
       </div>
 
       <div class="cv-item">
-        <div class="cv-item-title">Dean's List</div>
-        <div class="cv-item-org">University of Information Technology And Science (UITS)</div>
+        <div class="cv-item-title">Dean's List </div>
+        <div class="cv-item-org">University oof Information Technology And Science (UITS)</div>
         <div class="cv-item-date">2020 – 2022</div>
       </div>
 
@@ -971,22 +969,22 @@ footer p{font-size:.78rem;color:var(--muted2);}
   </div>
   <div class="masonry reveal" id="masonry">
     <div class="gal-item">
-      <div class="gal-ph"><div class="ic"></div><span>Hackathon Win</span></div>
+      <div class="gal-ph"><div class="ic">🏆</div><span>Hackathon Win</span></div>
       <div class="gal-overlay">
         <button class="gal-del-btn" onclick="delGalItem(this)"> Remove</button>
       </div>
     </div>
     <div class="gal-item" style="background:linear-gradient(135deg,rgba(52,211,153,.1),rgba(56,189,248,.08))">
       <div class="gal-ph"><div class="ic">🎓</div><span>Campus</span></div>
-      <div class="gal-overlay"><button class="gal-del-btn" onclick="delGalItem(this)">🗑 Remove</button></div>
+      <div class="gal-overlay"><button class="gal-del-btn" onclick="delGalItem(this)"> Remove</button></div>
     </div>
     <div class="gal-item" style="background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(167,139,250,.08))">
       <div class="gal-ph"><div class="ic">💻</div><span>Deep Work</span></div>
-      <div class="gal-overlay"><button class="gal-del-btn" onclick="delGalItem(this)">🗑 Remove</button></div>
+      <div class="gal-overlay"><button class="gal-del-btn" onclick="delGalItem(this)"> Remove</button></div>
     </div>
     <div class="gal-item" style="background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(52,211,153,.07))">
       <div class="gal-ph"><div class="ic">📡</div><span>Tech Meetup</span></div>
-      <div class="gal-overlay"><button class="gal-del-btn" onclick="delGalItem(this)">🗑 Remove</button></div>
+      <div class="gal-overlay"><button class="gal-del-btn" onclick="delGalItem(this)"> Remove</button></div>
     </div>
   </div>
 </section>
@@ -999,7 +997,7 @@ footer p{font-size:.78rem;color:var(--muted2);}
     <p class="sec-sub">Data engineering insights, learning updates, and whatever's on my mind.</p>
   </div>
   <!-- Compose — owner only -->
-  <div class="compose owner-visible reveal" id="composeBox">
+  <div class="compose reveal" id="composeBox" style="display:none;">
     <div class="compose-head">
       <div class="avatar">EA</div>
       <strong>What's on your mind, Emon?</strong>
@@ -1018,7 +1016,7 @@ footer p{font-size:.78rem;color:var(--muted2);}
     </div>
     <!-- GitHub Token input — owner only, shown once -->
     <div id="tokenBar" style="display:none;margin-top:1rem;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:12px;padding:1rem 1.25rem;">
-      <p style="font-size:.82rem;color:var(--a2);margin-bottom:.65rem;">🔑 <strong style="color:var(--text);">Enter your GitHub Personal Access Token</strong> to save posts to your repo. Only needed once per session.</p>
+      <p style="font-size:.82rem;color:var(--a2);margin-bottom:.65rem;"> <strong style="color:var(--text);">Enter your GitHub Personal Access Token</strong> to save posts to your repo. Only needed once per session.</p>
       <div style="display:flex;gap:.65rem;flex-wrap:wrap;">
         <input type="password" id="ghTokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="flex:1;min-width:200px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:.55rem .9rem;font-family:'Outfit',sans-serif;font-size:.85rem;color:var(--text);"/>
         <button onclick="saveToken()" style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);color:var(--a2);border-radius:8px;padding:.55rem 1.1rem;font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:700;cursor:none;transition:all .2s;">Save Token</button>
@@ -1047,8 +1045,8 @@ footer p{font-size:.78rem;color:var(--muted2);}
       <p>Looking for internships, data engineering roles, or a collaborator on your next data project. Always happy to talk pipelines and systems design.</p>
       <div class="clinks">
         <a href="mailto:emon@example.com" class="clink"><div class="clink-icon">📧</div>emon@example.com</a>
-        <a href="https://github.com/emonahmed" target="_blank" class="clink"><div class="clink-icon">🐙</div>https://github.com/Emon1073</a>
-        <a href="https://linkedin.com/in/emonahmed" target="_blank" class="clink"><div class="clink-icon">💼</div>https://www.linkedin.com/in/emon-ahmed-805855234/</a>
+        <a href="https://github.com/emonahmed" target="_blank" class="clink"><div class="clink-icon">🐙</div>github.com/emonahmed</a>
+        <a href="https://linkedin.com/in/emonahmed" target="_blank" class="clink"><div class="clink-icon">💼</div>linkedin.com/in/emonahmed</a>
         <a href="https://twitter.com/emon_data" target="_blank" class="clink"><div class="clink-icon">🐦</div>@emon_data</a>
       </div>
     </div>
@@ -1366,10 +1364,13 @@ function saveToken(){
   if(!t){toast('Paste your token first!');return;}
   sessionStorage.setItem('gh_token',t);
   document.getElementById('tokenBar').style.display='none';
-  toast('Token saved for this session 🔑');
-  /* retry pending post if any */
-  if(window._pendingPost){submitPost();window._pendingPost=false;}
+  toast('Token saved 🔑 — you can now post!');
+  if(window._pendingPost){window._pendingPost=false;submitPost();}
 }
+document.addEventListener('DOMContentLoaded',function(){
+  var ti=document.getElementById('ghTokenInput');
+  if(ti)ti.addEventListener('keydown',function(e){if(e.key==='Enter')saveToken();});
+});
 
 /* Sync status bar helper */
 function syncStatus(msg,color){
