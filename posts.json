@@ -1,0 +1,8 @@
+[
+  {
+    "id": "post_0000000000001",
+    "mood": "💡 Insight",
+    "time": "May 17, 2025 at 12:00 PM",
+    "content": "Finally got my Kafka → Spark → Snowflake pipeline running with under 2s end-to-end latency. The trick was tuning the microbatch interval and Snowflake connector pool size. Data engineering is mostly debugging what nobody documented 😄"
+  }
+]

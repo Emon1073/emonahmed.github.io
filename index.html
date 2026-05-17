@@ -648,9 +648,10 @@ footer p{font-size:.78rem;color:var(--muted2);}
     </div>
     <h1>
       Emon Ahmed
+      <span class="line2">Data Engineer</span>
     </h1>
     <p class="hero-sub">
-      As a Data Engineer I design and build the infrastructure that turns raw data into reliable insight —
+      I design and build the infrastructure that turns raw data into reliable insight —
       pipelines, warehouses, streams, and everything in between.
     </p>
     <div class="hero-cta">
@@ -707,12 +708,12 @@ footer p{font-size:.78rem;color:var(--muted2);}
     <div class="photo-wrap">
       <div class="photo-zone" id="photoZone" onclick="ownerAction(function(){document.getElementById('photoInput').click()})">
         <div class="ui">📸</div>
-        <p><img src="img.jpg" alt="" width="350" height="600 > </p>
+        <p>Upload your photo</p>
         <small>JPG · PNG · WEBP</small>
         <img id="photoDisplay" src="" alt="Emon Ahmed"/>
       </div>
       <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="uploadPhoto(event)"/>
-      <!--<div class="photo-badge">Data Engineer 🔧</div>-->
+      <div class="photo-badge">Data Engineer 🔧</div>
     </div>
     <div class="about-right">
       <p class="sec-label">About Me</p>
@@ -811,18 +812,9 @@ footer p{font-size:.78rem;color:var(--muted2);}
       <h3>Education</h3>
 
       <div class="cv-item">
-        <div class="cv-item-title">BSc in Infotronic System Engineering</div>
-        <div class="cv-item-org"> Rhine Waal University of Applied Science</div>
-        <div class="cv-item-date">2023 – Present </div>
-        <div class="cv-item-desc">
-          Relevant coursework: Databases, Distributed Systems, Algorithms, Cloud Computing, Machine Learning, Big Data Systems.
-        </div>
-      </div>
-	  
-	  <div class="cv-item">
-        <div class="cv-item-title">BSc in Computer SCience And Engineering (CSE)</div>
-        <div class="cv-item-org"> University of Information Technology And SCience (UITS)</div>
-        <div class="cv-item-date">2020 – 2022 </div>
+        <div class="cv-item-title">BSc Computer Science</div>
+        <div class="cv-item-org">University of Dhaka</div>
+        <div class="cv-item-date">2022 – Present · CGPA 3.8 / 4.0</div>
         <div class="cv-item-desc">
           Relevant coursework: Databases, Distributed Systems, Algorithms, Cloud Computing, Machine Learning, Big Data Systems.
         </div>
@@ -830,22 +822,22 @@ footer p{font-size:.78rem;color:var(--muted2);}
 
       <div class="cv-item">
         <div class="cv-item-title">Higher Secondary Certificate (HSC)</div>
-        <div class="cv-item-org"></div>
-        <div class="cv-item-date">2015 – 2017</div>
+        <div class="cv-item-org">Dhaka College</div>
+        <div class="cv-item-date">2020 – 2022 · GPA 5.0 / 5.0</div>
       </div>
 
       <h3 style="margin-top:2rem;">Achievements</h3>
 
       <div class="cv-item">
-        <div class="cv-item-title">National Data Engineering Hackathon</div>
+        <div class="cv-item-title">1st Place — National Data Engineering Hackathon</div>
         <div class="cv-item-org">BD Tech Council</div>
         <div class="cv-item-date">2024</div>
         <div class="cv-item-desc">Built a real-time fraud detection pipeline in 24h using Kafka + Flink.</div>
       </div>
 
       <div class="cv-item">
-        <div class="cv-item-title">Dean's List — 2 consecutive semesters</div>
-        <div class="cv-item-org">University of Information Technology And SCience (UITS)</div>
+        <div class="cv-item-title">Dean's List — 3 consecutive semesters</div>
+        <div class="cv-item-org">University of Dhaka</div>
         <div class="cv-item-date">2022 – 2024</div>
       </div>
 
@@ -902,7 +894,7 @@ footer p{font-size:.78rem;color:var(--muted2);}
     <div class="proj-card">
       <div class="proj-img-area">
         <div class="proj-img-btn" onclick="ownerAction(function(){triggerImg('p1')})">
-          <div class="ic"></div><span>Add screenshot</span>
+          <div class="ic">📊</div><span>Add screenshot</span>
         </div>
         <img src="" alt="" id="p1-img"/>
         <input type="file" id="p1-file" accept="image/*" style="display:none" onchange="uploadImg(event,'p1')"/>
@@ -918,7 +910,7 @@ footer p{font-size:.78rem;color:var(--muted2);}
     <div class="proj-card">
       <div class="proj-img-area" style="background:linear-gradient(135deg,rgba(52,211,153,.1),rgba(56,189,248,.07))">
         <div class="proj-img-btn" onclick="ownerAction(function(){triggerImg('p2')})">
-          <div class="ic"></div><span>Add screenshot</span>
+          <div class="ic">🗄️</div><span>Add screenshot</span>
         </div>
         <img src="" alt="" id="p2-img"/>
         <input type="file" id="p2-file" accept="image/*" style="display:none" onchange="uploadImg(event,'p2')"/>
@@ -934,7 +926,7 @@ footer p{font-size:.78rem;color:var(--muted2);}
     <div class="proj-card">
       <div class="proj-img-area" style="background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(251,191,36,.06))">
         <div class="proj-img-btn" onclick="ownerAction(function(){triggerImg('p3')})">
-          <div class="ic"></div><span>Add screenshot</span>
+          <div class="ic">🤖</div><span>Add screenshot</span>
         </div>
         <img src="" alt="" id="p3-img"/>
         <input type="file" id="p3-file" accept="image/*" style="display:none" onchange="uploadImg(event,'p3')"/>
@@ -964,29 +956,29 @@ footer p{font-size:.78rem;color:var(--muted2);}
   </div>
   <div class="gal-owner-bar reveal" id="galOwnerBar">
     <div class="gal-upload-zone" onclick="document.getElementById('galInput').click()">
-      <div class="ui"></div>
+      <div class="ui">🖼</div>
       <div><p>Add photos to gallery</p><small>JPG · PNG · WEBP · multiple files supported</small></div>
     </div>
     <input type="file" id="galInput" accept="image/*" multiple style="display:none" onchange="uploadGal(event)"/>
   </div>
   <div class="masonry reveal" id="masonry">
     <div class="gal-item">
-      <div class="gal-ph"><div class="ic"></div><span>Hackathon Win</span></div>
+      <div class="gal-ph"><div class="ic">🏆</div><span>Hackathon Win</span></div>
       <div class="gal-overlay">
-        <button class="gal-del-btn" onclick="delGalItem(this)"> Remove</button>
+        <button class="gal-del-btn" onclick="delGalItem(this)">🗑 Remove</button>
       </div>
     </div>
     <div class="gal-item" style="background:linear-gradient(135deg,rgba(52,211,153,.1),rgba(56,189,248,.08))">
-      <div class="gal-ph"><div class="ic"></div><span>Campus</span></div>
-      <div class="gal-overlay"><button class="gal-del-btn" onclick="delGalItem(this)"> Remove</button></div>
+      <div class="gal-ph"><div class="ic">🎓</div><span>Campus</span></div>
+      <div class="gal-overlay"><button class="gal-del-btn" onclick="delGalItem(this)">🗑 Remove</button></div>
     </div>
     <div class="gal-item" style="background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(167,139,250,.08))">
-      <div class="gal-ph"><div class="ic"></div><span>Deep Work</span></div>
-      <div class="gal-overlay"><button class="gal-del-btn" onclick="delGalItem(this)"> Remove</button></div>
+      <div class="gal-ph"><div class="ic">💻</div><span>Deep Work</span></div>
+      <div class="gal-overlay"><button class="gal-del-btn" onclick="delGalItem(this)">🗑 Remove</button></div>
     </div>
     <div class="gal-item" style="background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(52,211,153,.07))">
-      <div class="gal-ph"><div class="ic"></div><span>Tech Meetup</span></div>
-      <div class="gal-overlay"><button class="gal-del-btn" onclick="delGalItem(this)"> Remove</button></div>
+      <div class="gal-ph"><div class="ic">📡</div><span>Tech Meetup</span></div>
+      <div class="gal-overlay"><button class="gal-del-btn" onclick="delGalItem(this)">🗑 Remove</button></div>
     </div>
   </div>
 </section>
@@ -1016,33 +1008,28 @@ footer p{font-size:.78rem;color:var(--muted2);}
       </div>
       <button class="post-btn" onclick="submitPost()">Post →</button>
     </div>
-  </div>
-  <!-- Save banner: shows after posting with copy-to-HTML instructions -->
-  <div class="save-banner" id="saveBanner">
-    <p> <strong>Post saved!</strong> It's stored in this browser. To make it permanent for <em>all visitors</em> on GitHub Pages, copy the HTML below and paste it inside <code style="color:var(--a1);font-family:monospace">&lt;div id="postsFeed"&gt;</code> in your HTML file, then push to GitHub.</p>
-    <pre id="saveBannerCode"></pre>
-    <button class="copy-html-btn" onclick="copyPostHtml()"> Copy HTML to clipboard</button>
+    <!-- GitHub Token input — owner only, shown once -->
+    <div id="tokenBar" style="display:none;margin-top:1rem;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:12px;padding:1rem 1.25rem;">
+      <p style="font-size:.82rem;color:var(--a2);margin-bottom:.65rem;">🔑 <strong style="color:var(--text);">Enter your GitHub Personal Access Token</strong> to save posts to your repo. Only needed once per session.</p>
+      <div style="display:flex;gap:.65rem;flex-wrap:wrap;">
+        <input type="password" id="ghTokenInput" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx" style="flex:1;min-width:200px;background:rgba(255,255,255,.04);border:1px solid var(--border);border-radius:8px;padding:.55rem .9rem;font-family:'Outfit',sans-serif;font-size:.85rem;color:var(--text);"/>
+        <button onclick="saveToken()" style="background:rgba(251,191,36,.15);border:1px solid rgba(251,191,36,.3);color:var(--a2);border-radius:8px;padding:.55rem 1.1rem;font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:700;cursor:none;transition:all .2s;">Save Token</button>
+      </div>
+      <p style="font-size:.72rem;color:var(--muted);margin-top:.5rem;">Token is stored only in your browser. Visitors never see it. Generate at github.com/settings/tokens — tick <strong>repo</strong> scope only.</p>
+    </div>
+    <!-- Sync status bar -->
+    <div id="syncBar" style="display:none;margin-top:.75rem;border-radius:10px;padding:.6rem 1rem;font-size:.8rem;font-weight:600;"></div>
   </div>
   <div class="posts-feed reveal" id="postsFeed">
-    <div class="post">
-      <div class="post-head">
-        <div class="avatar">EA</div>
-        <div class="post-meta">
-          <div class="post-author">Emon Ahmed <span class="pmtag">Insight</span></div>
-          <div class="post-time">May 2026</div>
-        </div>
-      </div>
-      <div class="post-content">Finally got my Kafka → Spark → Snowflake pipeline running with under 2s end-to-end latency. The trick was tuning the microbatch interval and Snowflake connector pool size. Data engineering is mostly debugging what nobody documented 😄</div>
-      <div class="post-acts">
-        <button class="pact" onclick="likePost(this)"> Like</button>
-        <button class="pact"> Comment</button>
-        <button class="pdel owner-visible" onclick="delPost(this)">Delete</button>
-      </div>
+    <!-- Posts loaded from posts.json on GitHub -->
+    <div id="postsLoading" style="text-align:center;padding:3rem 0;color:var(--muted2);font-size:.875rem;">
+      <div style="font-size:1.5rem;margin-bottom:.5rem;animation:blink 1.2s infinite;">⟳</div>
+      Loading posts...
     </div>
   </div>
 </section>
 
-<!-- ════════ CONTACT ════════ --> 
+<!-- ════════ CONTACT ════════ -->
 <section id="contact">
   <div class="contact-grid reveal">
     <div class="contact-info">
@@ -1051,7 +1038,7 @@ footer p{font-size:.78rem;color:var(--muted2);}
       <!-- ✏️ OWNER: Edit contact links below -->
       <p>Looking for internships, data engineering roles, or a collaborator on your next data project. Always happy to talk pipelines and systems design.</p>
       <div class="clinks">
-        <a href="mailto:emon@example.com" class="clink"><div class="clink-icon">📧</div>emonahmed.rup@gmail.com</a>
+        <a href="mailto:emon@example.com" class="clink"><div class="clink-icon">📧</div>emon@example.com</a>
         <a href="https://github.com/emonahmed" target="_blank" class="clink"><div class="clink-icon">🐙</div>github.com/emonahmed</a>
         <a href="https://linkedin.com/in/emonahmed" target="_blank" class="clink"><div class="clink-icon">💼</div>linkedin.com/in/emonahmed</a>
         <a href="https://twitter.com/emon_data" target="_blank" class="clink"><div class="clink-icon">🐦</div>@emon_data</a>
@@ -1063,7 +1050,7 @@ footer p{font-size:.78rem;color:var(--muted2);}
       <div class="fg"><label>Email</label><input type="email" placeholder="your@email.com"/></div>
       <div class="fg"><label>Subject</label><input type="text" placeholder="Internship, project, collab..."/></div>
       <div class="fg"><label>Message</label><textarea placeholder="Tell me what you're building..."></textarea></div>
-      <button class="btn-glow" style="width:100%;border-radius:10px;" onclick="sendMsg()">Send Message </button>
+      <button class="btn-glow" style="width:100%;border-radius:10px;" onclick="sendMsg()">Send Message 🚀</button>
     </div>
   </div>
 </section>
@@ -1071,7 +1058,7 @@ footer p{font-size:.78rem;color:var(--muted2);}
 <!-- FOOTER -->
 <footer>
   <div class="flogo">Emon<span>.</span></div>
-  <p>© 2026 Emon Ahmed · Data Engineer in the Making</p>
+  <p>© 2025 Emon Ahmed · Data Engineer in the Making</p>
   <p>CS Student · Pipeline Builder · Open Source Contributor</p>
 </footer>
 
@@ -1211,6 +1198,8 @@ function activateOwner(){
   document.querySelectorAll('.doc-del-btn').forEach(function(e){e.classList.add('visible');});
   document.querySelectorAll('.gal-del-btn').forEach(function(e){e.classList.add('owner-visible');});
   document.getElementById('photoZone').style.cursor='none';
+  /* show token bar if no token stored yet */
+  if(!getToken()) document.getElementById('tokenBar').style.display='block';
   toast('Owner mode activated 🔓');
 }
 function lockOwner(){
@@ -1222,6 +1211,8 @@ function lockOwner(){
   document.getElementById('viewerNote').classList.remove('hidden');
   document.getElementById('galOwnerBar').classList.remove('visible');
   document.getElementById('composeBox').style.display='none';
+  document.getElementById('tokenBar').style.display='none';
+  document.getElementById('syncBar').style.display='none';
   document.getElementById('addProjBtn').classList.remove('owner-visible');
   document.querySelectorAll('.pdel').forEach(function(e){e.classList.remove('owner-visible');});
   document.querySelectorAll('.doc-del-btn').forEach(function(e){e.classList.remove('visible');});
@@ -1349,123 +1340,233 @@ function delGalItem(btn){
 }
 
 /* ══════════════════════════════════════
-   POSTS — localStorage persistence
+   POSTS — GitHub API (posts.json in repo)
+   Repo: Emon1073/yourusername.github.io
 ══════════════════════════════════════ */
-var mood='';
-var LS_KEY='emon_posts_v1';
+var mood = '';
+var GH_USER  = 'Emon1073';
+var GH_REPO  = 'yourusername.github.io';
+var GH_FILE  = 'posts.json';
+var GH_BRANCH= 'main';
+var GH_API   = 'https://api.github.com/repos/'+GH_USER+'/'+GH_REPO+'/contents/'+GH_FILE;
+var GH_RAW   = 'https://raw.githubusercontent.com/'+GH_USER+'/'+GH_REPO+'/'+GH_BRANCH+'/'+GH_FILE;
 
-/* Build post HTML string from data object */
-function buildPostHTML(data){
-  var mTag=data.mood?'<span class="pmtag">'+data.mood+'</span>':'';
-  return '<div class="post" data-id="'+data.id+'">'
+/* Token stored in sessionStorage (cleared when browser tab closes) */
+function getToken(){ return sessionStorage.getItem('gh_token')||''; }
+function saveToken(){
+  var t=document.getElementById('ghTokenInput').value.trim();
+  if(!t){toast('Paste your token first!');return;}
+  sessionStorage.setItem('gh_token',t);
+  document.getElementById('tokenBar').style.display='none';
+  toast('Token saved for this session 🔑');
+  /* retry pending post if any */
+  if(window._pendingPost){submitPost();window._pendingPost=false;}
+}
+
+/* Sync status bar helper */
+function syncStatus(msg,color){
+  var bar=document.getElementById('syncBar');
+  bar.textContent=msg;
+  bar.style.display='block';
+  bar.style.background='rgba('+color+',0.08)';
+  bar.style.border='1px solid rgba('+color+',0.25)';
+  bar.style.color='rgb('+color+')';
+}
+function syncOk(msg){syncStatus('✓ '+msg,'52,211,153');}
+function syncErr(msg){syncStatus('✗ '+msg,'248,113,113');}
+function syncInfo(msg){syncStatus('⟳ '+msg,'56,189,248');}
+
+/* ── Build post card HTML ── */
+function buildPostHTML(d){
+  var mTag=d.mood?'<span class="pmtag">'+d.mood+'</span>':'';
+  return '<div class="post" data-id="'+d.id+'">'
     +'<div class="post-head"><div class="avatar">EA</div>'
     +'<div class="post-meta">'
     +'<div class="post-author">Emon Ahmed '+mTag+'</div>'
-    +'<div class="post-time">'+data.time+'</div>'
+    +'<div class="post-time">'+d.time+'</div>'
     +'</div></div>'
-    +'<div class="post-content">'+data.content+'</div>'
+    +'<div class="post-content">'+d.content+'</div>'
     +'<div class="post-acts">'
     +'<button class="pact" onclick="likePost(this)">❤️ Like</button>'
     +'<button class="pact">💬 Comment</button>'
-    +'<button class="pdel owner-visible" onclick="delPost(this)">Delete</button>'
+    +'<button class="pdel" onclick="delPost(this)">Delete</button>'
     +'</div></div>';
 }
 
-/* Load saved posts from localStorage and prepend to feed */
-function loadSavedPosts(){
-  try{
-    var saved=JSON.parse(localStorage.getItem(LS_KEY)||'[]');
-    var feed=document.getElementById('postsFeed');
-    /* prepend newest first, before hardcoded posts */
-    saved.slice().reverse().forEach(function(d){
-      var el=document.createElement('div');
-      el.outerHTML; /* dummy */
-      var tmp=document.createElement('template');
-      tmp.innerHTML=buildPostHTML(d);
-      feed.insertBefore(tmp.content.firstChild,feed.firstChild);
+/* ── Render posts array into feed ── */
+function renderPosts(posts){
+  var feed=document.getElementById('postsFeed');
+  feed.innerHTML='';
+  if(!posts||!posts.length){
+    feed.innerHTML='<div style="text-align:center;padding:3rem 0;color:var(--muted2);font-size:.875rem;">No posts yet. Be the first to post!</div>';
+    return;
+  }
+  posts.forEach(function(d){
+    var tmp=document.createElement('template');
+    tmp.innerHTML=buildPostHTML(d);
+    var el=tmp.content.firstChild;
+    /* show delete btn only if owner */
+    if(isOwner) el.querySelector('.pdel').classList.add('owner-visible');
+    feed.appendChild(el);
+  });
+}
+
+/* ── Load posts.json from GitHub (public raw URL, no auth needed) ── */
+function loadPosts(){
+  syncInfo('Loading posts...');
+  fetch(GH_RAW+'?nocache='+Date.now())
+    .then(function(r){
+      if(r.status===404){
+        /* file doesn't exist yet — that's fine */
+        document.getElementById('postsLoading').style.display='none';
+        renderPosts([]);
+        syncOk('No posts yet — publish your first one!');
+        return null;
+      }
+      return r.json();
+    })
+    .then(function(data){
+      if(!data)return;
+      document.getElementById('postsLoading').style.display='none';
+      renderPosts(data);
+      syncOk('Posts loaded ('+data.length+' total)');
+      /* hide sync bar after 3s */
+      setTimeout(function(){document.getElementById('syncBar').style.display='none';},3000);
+    })
+    .catch(function(e){
+      document.getElementById('postsLoading').style.display='none';
+      renderPosts([]);
+      syncErr('Could not load posts — check your internet connection');
     });
-  }catch(e){}
 }
-loadSavedPosts();
+loadPosts();
 
-/* Save posts array to localStorage */
-function savePostsToLS(posts){
-  try{localStorage.setItem(LS_KEY,JSON.stringify(posts));}catch(e){}
-}
-
-/* Get current stored posts */
-function getStoredPosts(){
-  try{return JSON.parse(localStorage.getItem(LS_KEY)||'[]');}catch(e){return[];}
+/* ── Get current SHA of posts.json (required for GitHub API update) ── */
+function getFileSHA(token){
+  return fetch(GH_API,{headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}})
+    .then(function(r){if(r.status===404)return null;return r.json();})
+    .then(function(d){return d?d.sha:null;});
 }
 
-var lastPostHTML=''; /* for copy-to-HTML */
+/* ── Commit posts array to GitHub as posts.json ── */
+function commitPosts(posts,token,message){
+  var content=btoa(unescape(encodeURIComponent(JSON.stringify(posts,null,2))));
+  return getFileSHA(token).then(function(sha){
+    var body={message:message,content:content,branch:GH_BRANCH};
+    if(sha)body.sha=sha;
+    return fetch(GH_API,{
+      method:'PUT',
+      headers:{
+        'Authorization':'token '+token,
+        'Content-Type':'application/json',
+        'Accept':'application/vnd.github.v3+json'
+      },
+      body:JSON.stringify(body)
+    });
+  });
+}
 
+/* ── Get current posts from raw (for safe read-before-write) ── */
+function fetchCurrentPosts(token){
+  return fetch(GH_RAW+'?nocache='+Date.now())
+    .then(function(r){if(r.status===404)return[];return r.json();})
+    .catch(function(){return[];});
+}
+
+/* ── Mood picker ── */
 function pickMood(btn,m){
   document.querySelectorAll('.mood-btn').forEach(function(b){b.classList.remove('active');});
   btn.classList.add('active');mood=m;
 }
 
+/* ── Submit new post ── */
 function submitPost(){
   if(!isOwner)return;
   var txt=document.getElementById('postTxt').value.trim();
   if(!txt){toast('Write something first!');return;}
-  var now=new Date().toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric'});
-  var id='post_'+Date.now();
-  var data={id:id,mood:mood,time:now,content:txt.replace(/\n/g,'<br>')};
+  var token=getToken();
+  if(!token){
+    /* show token input bar */
+    window._pendingPost=true;
+    document.getElementById('tokenBar').style.display='block';
+    document.getElementById('ghTokenInput').focus();
+    toast('Enter your GitHub token first 🔑');
+    return;
+  }
+  var now=new Date().toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  var data={id:'post_'+Date.now(),mood:mood,time:now,content:txt.replace(/\n/g,'<br>')};
 
-  /* Save to localStorage */
-  var posts=getStoredPosts();
-  posts.unshift(data);
-  savePostsToLS(posts);
+  /* Disable post button while saving */
+  var postBtn=document.querySelector('.post-btn');
+  postBtn.textContent='Saving...';postBtn.disabled=true;
+  syncInfo('Saving post to GitHub...');
 
-  /* Render in feed */
-  var feed=document.getElementById('postsFeed');
-  var tmp=document.createElement('template');
-  tmp.innerHTML=buildPostHTML(data);
-  var el=tmp.content.firstChild;
-  /* apply owner-visible state */
-  if(isOwner)el.querySelector('.pdel').classList.add('owner-visible');
-  feed.insertBefore(el,feed.firstChild);
-
-  /* Show save banner with copy HTML */
-  lastPostHTML=buildPostHTML(data).replace(/owner-visible/g,'owner-visible');
-  var cleanHTML='<!-- PASTE THIS inside <div id="postsFeed"> in your HTML file -->\n'+buildPostHTML(data);
-  document.getElementById('saveBannerCode').textContent=cleanHTML;
-  document.getElementById('saveBanner').classList.add('visible');
-
-  document.getElementById('postTxt').value='';
-  document.querySelectorAll('.mood-btn').forEach(function(b){b.classList.remove('active');});
-  mood='';
-  toast('Posted & saved locally ✨');
-}
-
-function copyPostHtml(){
-  var code=document.getElementById('saveBannerCode').textContent;
-  navigator.clipboard.writeText(code).then(function(){
-    toast('HTML copied! Paste into your HTML file & push to GitHub 🚀');
-  }).catch(function(){
-    toast('Select the code above and copy manually');
+  fetchCurrentPosts(token).then(function(posts){
+    posts.unshift(data); /* newest first */
+    return commitPosts(posts,token,'Add post: '+data.time);
+  }).then(function(res){
+    if(!res.ok){
+      return res.json().then(function(e){
+        throw new Error(e.message||'GitHub API error '+res.status);
+      });
+    }
+    /* success — re-render */
+    return fetchCurrentPosts(token).then(function(latest){
+      renderPosts(latest);
+      /* apply owner state to new delete btns */
+      document.querySelectorAll('.pdel').forEach(function(e){e.classList.add('owner-visible');});
+      syncOk('Post saved to GitHub ✓ — visible to all visitors now!');
+      setTimeout(function(){document.getElementById('syncBar').style.display='none';},4000);
+      toast('Post published to GitHub 🚀');
+    });
+  }).catch(function(err){
+    syncErr('Failed: '+err.message+' — check your token has repo scope');
+    toast('Save failed — see status bar');
+  }).finally(function(){
+    postBtn.textContent='Post →';postBtn.disabled=false;
+    document.getElementById('postTxt').value='';
+    document.querySelectorAll('.mood-btn').forEach(function(b){b.classList.remove('active');});
+    mood='';
+    window._pendingPost=false;
   });
 }
 
+/* ── Like (local only — cosmetic) ── */
 function likePost(btn){
   var liked=btn.textContent.includes('Liked');
   btn.textContent=liked?'❤️ Like':'❤️ Liked!';
   btn.style.color=liked?'':'var(--a1)';
 }
 
+/* ── Delete post ── */
 function delPost(btn){
   if(!isOwner)return;
+  var token=getToken();
+  if(!token){
+    document.getElementById('tokenBar').style.display='block';
+    document.getElementById('ghTokenInput').focus();
+    toast('Enter your GitHub token to delete 🔑');
+    return;
+  }
   var p=btn.closest('.post');
   var id=p.dataset.id;
-  /* remove from localStorage */
-  if(id){
-    var posts=getStoredPosts().filter(function(d){return d.id!==id;});
-    savePostsToLS(posts);
-  }
-  p.style.cssText='opacity:0;transform:translateX(30px);transition:all .3s;';
-  setTimeout(function(){p.remove();},300);
-  toast('Post deleted');
+  if(!confirm('Delete this post? This cannot be undone.'))return;
+
+  syncInfo('Deleting post from GitHub...');
+
+  fetchCurrentPosts(token).then(function(posts){
+    var updated=posts.filter(function(d){return d.id!==id;});
+    return commitPosts(updated,token,'Delete post '+id).then(function(res){
+      if(!res.ok)return res.json().then(function(e){throw new Error(e.message);});
+      p.style.cssText='opacity:0;transform:translateX(30px);transition:all .3s;';
+      setTimeout(function(){p.remove();},300);
+      syncOk('Post deleted from GitHub');
+      setTimeout(function(){document.getElementById('syncBar').style.display='none';},3500);
+      toast('Post deleted 🗑');
+    });
+  }).catch(function(err){
+    syncErr('Delete failed: '+err.message);
+  });
 }
 
 /* ══════════════════════════════════════
