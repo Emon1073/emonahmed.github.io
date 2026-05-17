@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Emon Ahmed — Data Engineer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════
+   ROOT & RESET
+═══════════════════════════════════════ */
+:root{
+  --bg:#07090f;
+  --bg2:#0d1117;
+  --card:rgba(255,255,255,0.04);
+  --card2:rgba(255,255,255,0.07);
+  --text:#f0ede8;
+  --muted:#7a8499;
+  --muted2:#4a5568;
+  --a1:#38bdf8;   /* sky */
+  --a2:#fbbf24;   /* amber */
+  --a3:#34d399;   /* emerald */
+  --a4:#a78bfa;   /* violet */
+  --border:rgba(255,255,255,0.08);
+  --border2:rgba(56,189,248,0.2);
+  --r:16px;
+  --glow:0 0 40px rgba(56,189,248,0.15);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{
+  font-family:'Outfit',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  line-height:1.7;
+  overflow-x:hidden;
+  cursor:none;
+}
+::selection{background:rgba(56,189,248,0.3);color:#fff;}
+
+/* ═══════════════════════════════════════
+   CUSTOM CURSOR
+═══════════════════════════════════════ */
+#cursor{position:fixed;width:10px;height:10px;border-radius:50%;background:var(--a1);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);transition:transform .1s,width .2s,height .2s,opacity .2s;mix-blend-mode:screen;}
+#cursor-ring{position:fixed;width:36px;height:36px;border-radius:50%;border:1.5px solid rgba(56,189,248,.4);pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:transform .12s ease-out,width .2s,height .2s;}
+body:has(a:hover) #cursor,body:has(button:hover) #cursor{width:18px;height:18px;}
+body:has(a:hover) #cursor-ring,body:has(button:hover) #cursor-ring{width:50px;height:50px;border-color:rgba(56,189,248,.25);}
+
+/* ═══════════════════════════════════════
+   CANVAS BACKGROUND
+═══════════════════════════════════════ */
+#bgCanvas{position:fixed;inset:0;z-index:0;pointer-events:none;}
+
+/* ═══════════════════════════════════════
+   GRAIN OVERLAY
+═══════════════════════════════════════ */
+body::before{
+  content:'';position:fixed;inset:0;z-index:1;pointer-events:none;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  opacity:.6;
+}
+
+/* ═══════════════════════════════════════
+   LAYOUT WRAPPER
+═══════════════════════════════════════ */
+.wrap{position:relative;z-index:2;}
+
+/* ═══════════════════════════════════════
+   NAV
+═══════════════════════════════════════ */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(1.25rem,5vw,4rem);height:60px;
+  background:rgba(7,9,15,0.85);backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.08em;color:var(--text);}
+.logo span{color:var(--a1);}
+.nav-links{display:flex;gap:1.75rem;list-style:none;}
+.nav-links a{font-size:.8rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-decoration:none;transition:color .2s;}
+.nav-links a:hover{color:var(--a1);}
+.nav-right{display:flex;align-items:center;gap:.75rem;}
+#ownerBtn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:.35rem .85rem;font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:600;cursor:none;letter-spacing:.04em;transition:all .2s;}
+#ownerBtn:hover{border-color:var(--a1);color:var(--a1);}
+#ownerBtn.active{border-color:var(--a3);color:var(--a3);background:rgba(52,211,153,.08);}
+.menu-btn{display:none;background:none;border:none;color:var(--text);font-size:1.3rem;cursor:none;}
+
+/* ═══════════════════════════════════════
+   OWNER GATE
+═══════════════════════════════════════ */
+.gate-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(7,9,15,.92);backdrop-filter:blur(20px);align-items:center;justify-content:center;}
+.gate-overlay.open{display:flex;}
+.gate-box{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:2.5rem;width:90%;max-width:380px;text-align:center;}
+.gate-box h3{font-family:'Bebas Neue',sans-serif;font-size:1.8rem;letter-spacing:.06em;color:var(--text);margin-bottom:.4rem;}
+.gate-box p{color:var(--muted);font-size:.875rem;margin-bottom:1.5rem;}
+.gate-input{width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:10px;padding:.75rem 1rem;font-family:'Outfit',sans-serif;font-size:1rem;color:var(--text);text-align:center;letter-spacing:.2em;margin-bottom:1rem;transition:border-color .2s;}
+.gate-input:focus{outline:none;border-color:var(--a1);}
+.gate-err{color:#f87171;font-size:.8rem;margin-bottom:.75rem;display:none;}
+
+/* ═══════════════════════════════════════
+   HERO
+═══════════════════════════════════════ */
+.hero{
+  min-height:100vh;
+  display:flex;align-items:center;
+  padding:80px clamp(1.25rem,6vw,5rem) 4rem;
+  position:relative;
+  overflow:hidden;
+}
+.hero-mesh{
+  position:absolute;right:-10%;top:-10%;
+  width:70vw;height:70vw;max-width:700px;max-height:700px;
+  background:
+    radial-gradient(ellipse at 30% 30%, rgba(56,189,248,.12) 0%, transparent 55%),
+    radial-gradient(ellipse at 70% 70%, rgba(167,139,250,.08) 0%, transparent 55%),
+    radial-gradient(ellipse at 50% 50%, rgba(52,211,153,.06) 0%, transparent 60%);
+  border-radius:40% 60% 55% 45%;
+  animation:meshFloat 10s ease-in-out infinite;
+  pointer-events:none;
+}
+@keyframes meshFloat{0%,100%{transform:translateY(0) rotate(0deg) scale(1)}50%{transform:translateY(-30px) rotate(6deg) scale(1.04)}}
+.hero-inner{max-width:780px;position:relative;z-index:1;}
+.hero-pre{display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;}
+.hero-pre-line{height:1px;width:40px;background:var(--a1);animation:lineGrow 1s ease-out .3s both;}
+@keyframes lineGrow{from{width:0;opacity:0}to{width:40px;opacity:1}}
+.hero-pre span{font-size:.72rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--a1);animation:fadeUp .6s ease-out .4s both;}
+.hero h1{
+  font-family:'Bebas Neue',sans-serif;
+  font-size:clamp(3.5rem,10vw,7.5rem);
+  line-height:1;letter-spacing:.04em;
+  color:var(--text);
+  animation:fadeUp .7s ease-out .2s both;
+}
+.hero h1 .line2{
+  display:block;
+  background:linear-gradient(90deg,var(--a1),var(--a4));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.hero-sub{font-size:clamp(.95rem,2vw,1.1rem);color:var(--muted);max-width:480px;margin:1.25rem 0 2.25rem;line-height:1.8;animation:fadeUp .7s ease-out .4s both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:none}}
+.hero-cta{display:flex;gap:1rem;flex-wrap:wrap;animation:fadeUp .7s ease-out .55s both;}
+.btn-glow{
+  position:relative;overflow:hidden;
+  background:linear-gradient(135deg,var(--a1),var(--a4));
+  color:#07090f;border:none;border-radius:100px;
+  padding:.85rem 2rem;font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:700;
+  cursor:none;text-decoration:none;display:inline-block;
+  transition:transform .2s,box-shadow .2s;
+  box-shadow:0 0 30px rgba(56,189,248,.25);
+}
+.btn-glow:hover{transform:translateY(-3px);box-shadow:0 0 50px rgba(56,189,248,.4);}
+.btn-glow::after{content:'';position:absolute;inset:-50%;background:rgba(255,255,255,.15);border-radius:50%;transform:scale(0);transition:transform .4s;}
+.btn-glow:hover::after{transform:scale(1);}
+.btn-outline{
+  background:transparent;color:var(--text);
+  border:1px solid var(--border2);border-radius:100px;
+  padding:.85rem 2rem;font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:600;
+  cursor:none;text-decoration:none;display:inline-block;
+  transition:all .2s;
+}
+.btn-outline:hover{border-color:var(--a1);color:var(--a1);box-shadow:var(--glow);}
+.hero-stats{display:flex;gap:2.5rem;margin-top:3.5rem;flex-wrap:wrap;animation:fadeUp .7s ease-out .7s both;}
+.hstat .n{font-family:'Bebas Neue',sans-serif;font-size:2.4rem;letter-spacing:.04em;color:var(--text);line-height:1;}
+.hstat .n span{color:var(--a1);}
+.hstat .l{font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:.2rem;}
+.scroll-hint{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:.5rem;animation:fadeUp .7s ease-out 1.2s both;}
+.scroll-hint span{font-size:.65rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);}
+.scroll-dot{width:4px;height:24px;border-radius:4px;background:var(--border2);position:relative;overflow:hidden;}
+.scroll-dot::after{content:'';position:absolute;top:0;left:0;right:0;height:40%;background:var(--a1);border-radius:4px;animation:scrollDot 1.8s ease-in-out infinite;}
+@keyframes scrollDot{0%,100%{transform:translateY(0)}50%{transform:translateY(150%)}}
+
+/* ═══════════════════════════════════════
+   PIPELINE TICKER
+═══════════════════════════════════════ */
+.ticker{overflow:hidden;background:rgba(56,189,248,.05);border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);padding:.7rem 0;}
+.ticker-inner{display:flex;gap:0;white-space:nowrap;animation:tickerScroll 25s linear infinite;}
+.ticker-inner:hover{animation-play-state:paused;}
+.ticker-item{display:inline-flex;align-items:center;gap:.6rem;padding:0 2.5rem;font-size:.73rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);}
+.ticker-item .dot{width:5px;height:5px;border-radius:50%;background:var(--a1);flex-shrink:0;}
+.ticker-item .arr{color:var(--muted2);}
+@keyframes tickerScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ═══════════════════════════════════════
+   SECTIONS
+═══════════════════════════════════════ */
+section{padding:6rem clamp(1.25rem,5vw,4rem);position:relative;z-index:2;}
+.sec-label{font-size:.68rem;font-weight:700;letter-spacing:.16em;text-transform:uppercase;color:var(--a1);margin-bottom:.6rem;display:flex;align-items:center;gap:.6rem;}
+.sec-label::before{content:'';display:inline-block;width:20px;height:1px;background:var(--a1);}
+.sec-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(2.2rem,5vw,3.5rem);letter-spacing:.04em;color:var(--text);margin-bottom:.75rem;line-height:1.05;}
+.sec-sub{color:var(--muted);max-width:460px;margin-bottom:2.5rem;font-size:.95rem;line-height:1.8;}
+
+/* ═══════════════════════════════════════
+   ABOUT
+═══════════════════════════════════════ */
+#about{background:linear-gradient(180deg,transparent,rgba(56,189,248,.02) 50%,transparent);}
+.about-grid{display:grid;grid-template-columns:340px 1fr;gap:4rem;align-items:start;}
+.photo-wrap{position:relative;}
+.photo-zone{
+  width:100%;aspect-ratio:3/4;border-radius:20px;
+  border:1px solid var(--border2);
+  background:linear-gradient(145deg,rgba(56,189,248,.08),rgba(167,139,250,.06));
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1rem;
+  cursor:none;transition:all .3s;position:relative;overflow:hidden;
+}
+.photo-zone::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(56,189,248,.04),transparent);
+  animation:shimmer 3s ease-in-out infinite;
+}
+@keyframes shimmer{0%,100%{opacity:1}50%{opacity:.4}}
+.photo-zone .ui{font-size:2.5rem;}
+.photo-zone p{font-weight:700;color:var(--text);font-size:.9rem;}
+.photo-zone small{color:var(--muted);font-size:.75rem;}
+/* viewer: no pointer on photo when locked */
+body.viewer-mode .photo-zone{cursor:default;pointer-events:none;opacity:.9;}
+#photoDisplay{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:20px;display:none;}
+.photo-badge{
+  position:absolute;bottom:-1px;left:50%;transform:translateX(-50%);
+  background:linear-gradient(90deg,var(--a1),var(--a4));
+  color:#07090f;border-radius:0 0 18px 18px;
+  padding:.55rem 1.4rem;font-weight:800;font-size:.78rem;letter-spacing:.04em;white-space:nowrap;
+}
+.about-right{padding-top:.5rem;}
+.about-right .sec-title{margin-bottom:1rem;}
+.about-p{color:var(--muted);font-size:.95rem;line-height:1.85;margin-bottom:.85rem;}
+.about-p strong{color:var(--text);font-weight:700;}
+.skills-section{margin-top:2rem;}
+.skills-section h4{font-size:.72rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--a1);margin-bottom:.9rem;display:flex;align-items:center;gap:.6rem;}
+.skills-section h4::before{content:'';display:inline-block;width:14px;height:1px;background:var(--a1);}
+.stags{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.25rem;}
+.stag{border-radius:8px;padding:.28rem .8rem;font-size:.75rem;font-weight:700;letter-spacing:.03em;border:1px solid;transition:all .2s;}
+.stag.b{background:rgba(56,189,248,.08);border-color:rgba(56,189,248,.2);color:var(--a1);}
+.stag.y{background:rgba(251,191,36,.08);border-color:rgba(251,191,36,.2);color:var(--a2);}
+.stag.g{background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.2);color:var(--a3);}
+.stag.v{background:rgba(167,139,250,.08);border-color:rgba(167,139,250,.2);color:var(--a4);}
+.stag:hover{transform:translateY(-2px);box-shadow:0 4px 16px rgba(56,189,248,.15);}
+
+/* ═══════════════════════════════════════
+   CV (MANUAL — EDIT IN HTML)
+═══════════════════════════════════════ */
+#cv{background:linear-gradient(180deg,transparent,rgba(167,139,250,.02) 50%,transparent);}
+.cv-grid{display:grid;grid-template-columns:1fr 1fr;gap:2rem;}
+.cv-col h3{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.06em;color:var(--text);margin-bottom:1.25rem;display:flex;align-items:center;gap:.6rem;}
+.cv-col h3::before{content:'';display:inline-block;width:14px;height:2px;background:var(--a1);border-radius:2px;}
+.cv-item{
+  border-left:2px solid var(--border2);
+  padding:.1rem 0 1.25rem 1.25rem;
+  margin-bottom:.1rem;
+  position:relative;
+}
+.cv-item::before{content:'';position:absolute;left:-5px;top:.5rem;width:8px;height:8px;border-radius:50%;background:var(--a1);box-shadow:0 0 10px var(--a1);}
+.cv-item-title{font-weight:700;color:var(--text);font-size:.95rem;line-height:1.3;}
+.cv-item-org{color:var(--a1);font-size:.82rem;font-weight:600;margin:.2rem 0;}
+.cv-item-date{color:var(--muted2);font-size:.75rem;font-weight:600;letter-spacing:.04em;margin-bottom:.4rem;}
+.cv-item-desc{color:var(--muted);font-size:.83rem;line-height:1.7;}
+.cv-item-desc li{margin-left:1rem;margin-bottom:.2rem;}
+
+/* ═══════════════════════════════════════
+   DOCUMENTS / CERTIFICATES (viewer read-only)
+═══════════════════════════════════════ */
+#docs{background:linear-gradient(180deg,transparent,rgba(52,211,153,.02) 50%,transparent);}
+.docs-owner-zone{
+  border:1.5px dashed rgba(56,189,248,.3);
+  border-radius:14px;padding:2.5rem 2rem;text-align:center;cursor:none;
+  transition:all .2s;margin-bottom:1.5rem;
+  background:rgba(56,189,248,.02);display:none;
+}
+.docs-owner-zone.visible{display:block;}
+.docs-owner-zone:hover{border-color:var(--a1);background:rgba(56,189,248,.05);}
+.docs-owner-zone .di{font-size:2.75rem;margin-bottom:.6rem;}
+.docs-owner-zone h3{font-family:'Bebas Neue',sans-serif;font-size:1.3rem;letter-spacing:.04em;color:var(--text);margin-bottom:.35rem;}
+.docs-owner-zone p{color:var(--muted);font-size:.85rem;}
+.viewer-note{
+  display:flex;align-items:center;gap:.75rem;
+  background:rgba(56,189,248,.05);border:1px solid var(--border2);
+  border-radius:12px;padding:1rem 1.25rem;margin-bottom:1.5rem;
+}
+.viewer-note.hidden{display:none;}
+.viewer-note span{font-size:.85rem;color:var(--muted);}
+.viewer-note strong{color:var(--a1);}
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem;}
+.doc-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:14px;padding:1.25rem;
+  display:flex;flex-direction:column;gap:.75rem;
+  transition:all .25s;position:relative;overflow:hidden;
+}
+.doc-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(56,189,248,.04),transparent);opacity:0;transition:opacity .2s;}
+.doc-card:hover{border-color:var(--border2);transform:translateY(-3px);box-shadow:0 12px 40px rgba(0,0,0,.3);}
+.doc-card:hover::before{opacity:1;}
+.doc-icon{font-size:2rem;}
+.doc-name{font-weight:700;color:var(--text);font-size:.875rem;line-height:1.3;}
+.doc-meta{font-size:.75rem;color:var(--muted);}
+.doc-actions{display:flex;gap:.5rem;margin-top:auto;}
+.doc-view-btn{
+  background:rgba(56,189,248,.1);border:1px solid rgba(56,189,248,.2);
+  color:var(--a1);border-radius:8px;padding:.3rem .8rem;
+  font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:700;cursor:none;
+  transition:all .2s;text-align:center;flex:1;
+}
+.doc-view-btn:hover{background:rgba(56,189,248,.2);}
+.doc-del-btn{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  color:var(--muted);border-radius:8px;padding:.3rem .6rem;
+  font-family:'Outfit',sans-serif;font-size:.75rem;font-weight:700;cursor:none;
+  transition:all .2s;display:none;
+}
+.doc-del-btn.visible{display:block;}
+.doc-del-btn:hover{border-color:rgba(248,113,113,.3);color:#f87171;background:rgba(248,113,113,.05);}
+
+/* ═══════════════════════════════════════
+   PROJECTS
+═══════════════════════════════════════ */
+#projects{background:linear-gradient(180deg,transparent,rgba(251,191,36,.02) 50%,transparent);}
+.proj-grid{display:flex;flex-wrap:wrap;justify-content:center;gap:1.5rem;}
+.proj-grid .proj-card{width:320px;flex-shrink:0;}
+.proj-grid .add-proj{width:320px;flex-shrink:0;}
+.proj-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);overflow:hidden;
+  transition:all .25s;position:relative;
+}
+.proj-card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(56,189,248,.06),rgba(167,139,250,.04));
+  opacity:0;transition:opacity .25s;pointer-events:none;
+}
+.proj-card:hover{transform:translateY(-5px);border-color:rgba(56,189,248,.2);box-shadow:0 20px 60px rgba(0,0,0,.4);}
+.proj-card:hover::after{opacity:1;}
+.proj-img-area{
+  width:100%;aspect-ratio:16/9;
+  background:linear-gradient(135deg,rgba(56,189,248,.1),rgba(167,139,250,.08));
+  position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;
+}
+.proj-img-area img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:none;}
+.proj-img-btn{display:flex;flex-direction:column;align-items:center;gap:.4rem;cursor:none;}
+body.viewer-mode .proj-img-btn{display:none;}
+body.viewer-mode .proj-img-area::after{content:'📊';font-size:2.5rem;position:absolute;}
+.proj-img-btn .ic{font-size:1.75rem;}
+.proj-img-btn span{font-size:.72rem;font-weight:600;color:var(--muted);}
+.proj-body{padding:1.35rem;}
+.ptag{display:inline-block;font-size:.65rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;border-radius:6px;padding:.2rem .65rem;margin-bottom:.65rem;border:1px solid;}
+.ptag.b{background:rgba(56,189,248,.1);border-color:rgba(56,189,248,.2);color:var(--a1);}
+.ptag.y{background:rgba(251,191,36,.1);border-color:rgba(251,191,36,.2);color:var(--a2);}
+.ptag.g{background:rgba(52,211,153,.1);border-color:rgba(52,211,153,.2);color:var(--a3);}
+.ptag.v{background:rgba(167,139,250,.1);border-color:rgba(167,139,250,.2);color:var(--a4);}
+.proj-title{font-family:'Bebas Neue',sans-serif;font-size:1.25rem;letter-spacing:.03em;color:var(--text);margin-bottom:.4rem;line-height:1.1;}
+.proj-desc{font-size:.83rem;color:var(--muted);margin-bottom:1rem;line-height:1.65;}
+.proj-links{display:flex;gap:.5rem;}
+.proj-links a{
+  font-size:.75rem;font-weight:700;color:var(--a4);
+  text-decoration:none;border:1px solid rgba(167,139,250,.2);
+  border-radius:8px;padding:.28rem .7rem;
+  transition:all .2s;background:rgba(167,139,250,.06);
+}
+.proj-links a:hover{background:rgba(167,139,250,.15);color:#c4b5fd;}
+.add-proj{
+  border:1.5px dashed var(--border);border-radius:var(--r);
+  display:flex;align-items:center;justify-content:center;flex-direction:column;
+  gap:.65rem;min-height:240px;cursor:none;background:none;
+  font-family:'Outfit',sans-serif;transition:all .2s;width:100%;
+  display:none;
+}
+.add-proj.owner-visible{display:flex;}
+.add-proj:hover{border-color:var(--a1);background:rgba(56,189,248,.03);}
+.add-proj .plus{font-size:2rem;color:var(--muted);}
+.add-proj span{font-size:.875rem;font-weight:700;color:var(--muted);}
+
+/* ═══════════════════════════════════════
+   GALLERY
+═══════════════════════════════════════ */
+#gallery{background:linear-gradient(180deg,transparent,rgba(167,139,250,.02) 50%,transparent);}
+.gal-owner-bar{display:none;margin-bottom:1.5rem;}
+.gal-owner-bar.visible{display:block;}
+.gal-upload-zone{
+  border:1.5px dashed rgba(56,189,248,.3);
+  border-radius:14px;padding:1.75rem 2rem;text-align:center;cursor:none;
+  transition:all .2s;background:rgba(56,189,248,.02);
+  display:flex;align-items:center;gap:1.25rem;
+}
+.gal-upload-zone:hover{border-color:var(--a1);background:rgba(56,189,248,.05);}
+.gal-upload-zone .ui{font-size:2rem;flex-shrink:0;}
+.gal-upload-zone p{font-weight:700;color:var(--text);font-size:.9rem;text-align:left;}
+.gal-upload-zone small{color:var(--muted);font-size:.78rem;display:block;margin-top:.2rem;}
+.masonry{display:flex;flex-wrap:wrap;justify-content:center;gap:1.5rem;}
+.gal-item{width:320px;flex-shrink:0;border-radius:12px;overflow:hidden;background:linear-gradient(135deg,rgba(56,189,248,.1),rgba(167,139,250,.08));position:relative;aspect-ratio:16/9;}
+.gal-item img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .4s;}
+.gal-item:hover img{transform:scale(1.05);}
+.gal-overlay{position:absolute;inset:0;background:rgba(7,9,15,.6);opacity:0;transition:opacity .3s;display:flex;align-items:center;justify-content:center;gap:.5rem;flex-wrap:wrap;}
+.gal-item:hover .gal-overlay{opacity:1;}
+.gal-del-btn{background:rgba(248,113,113,.15);border:1px solid rgba(248,113,113,.3);color:#f87171;border-radius:8px;padding:.3rem .7rem;font-size:.73rem;font-weight:700;cursor:none;font-family:'Outfit',sans-serif;display:none;}
+.gal-del-btn.owner-visible{display:block;}
+.gal-ph{width:100%;height:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:.5rem;opacity:.5;}
+.gal-ph .ic{font-size:2rem;}
+.gal-ph span{font-size:.72rem;font-weight:700;color:var(--muted);}
+
+/* ═══════════════════════════════════════
+   POSTS / FEELINGS
+═══════════════════════════════════════ */
+#posts{background:linear-gradient(180deg,transparent,rgba(56,189,248,.02) 50%,transparent);}
+.compose{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:1.5rem;margin-bottom:2rem;
+  display:none;
+}
+.compose.owner-visible{display:block;}
+.compose-head{display:flex;align-items:center;gap:.9rem;margin-bottom:1rem;}
+.avatar{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--a1),var(--a4));
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Bebas Neue',sans-serif;font-size:.95rem;letter-spacing:.04em;color:#07090f;
+}
+.compose-head strong{font-weight:700;color:var(--text);font-size:.95rem;}
+.compose textarea{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:12px;padding:.8rem 1rem;
+  font-family:'Outfit',sans-serif;font-size:.925rem;color:var(--text);
+  resize:none;min-height:95px;line-height:1.65;transition:border-color .2s;
+}
+.compose textarea:focus{outline:none;border-color:var(--a1);}
+.compose-foot{display:flex;align-items:center;justify-content:space-between;margin-top:.7rem;flex-wrap:wrap;gap:.65rem;}
+.mood-row{display:flex;gap:.4rem;flex-wrap:wrap;}
+.mood-btn{
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:100px;padding:.28rem .75rem;
+  font-size:.75rem;font-weight:700;cursor:none;
+  transition:all .15s;font-family:'Outfit',sans-serif;color:var(--muted);
+}
+.mood-btn:hover,.mood-btn.active{background:var(--a1);color:#07090f;border-color:transparent;}
+.post-btn{
+  background:linear-gradient(90deg,var(--a1),var(--a4));
+  color:#07090f;border:none;border-radius:100px;
+  padding:.5rem 1.4rem;font-family:'Outfit',sans-serif;font-size:.85rem;font-weight:700;
+  cursor:none;transition:all .2s;
+}
+.post-btn:hover{opacity:.9;transform:translateY(-1px);}
+.posts-feed{display:flex;flex-direction:column;gap:1rem;}
+.post{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:1.25rem 1.5rem;
+  transition:border-color .2s;
+}
+.post:hover{border-color:var(--border2);}
+.post-head{display:flex;align-items:center;gap:.75rem;margin-bottom:.85rem;}
+.post-meta{flex:1;}
+.post-author{font-weight:700;font-size:.875rem;color:var(--text);}
+.pmtag{font-size:.68rem;background:rgba(56,189,248,.1);color:var(--a1);border-radius:100px;padding:.18rem .6rem;font-weight:700;margin-left:.4rem;border:1px solid rgba(56,189,248,.2);}
+.post-time{font-size:.72rem;color:var(--muted2);}
+.post-content{font-size:.925rem;color:var(--muted);line-height:1.75;}
+.post-acts{display:flex;gap:.6rem;margin-top:.9rem;align-items:center;}
+.pact{
+  background:none;border:none;font-size:.75rem;color:var(--muted2);
+  cursor:none;font-family:'Outfit',sans-serif;font-weight:700;
+  padding:.22rem .55rem;border-radius:7px;transition:all .2s;
+}
+.pact:hover{background:rgba(255,255,255,.05);color:var(--muted);}
+.pdel{
+  margin-left:auto;background:none;border:none;
+  font-size:.72rem;color:var(--muted2);cursor:none;
+  font-family:'Outfit',sans-serif;font-weight:700;
+  border-radius:7px;padding:.22rem .55rem;transition:all .2s;display:none;
+}
+.pdel.owner-visible{display:block;}
+.pdel:hover{color:#f87171;background:rgba(248,113,113,.06);}
+/* save-post banner */
+.save-banner{display:none;margin-top:1rem;background:rgba(52,211,153,.07);border:1px solid rgba(52,211,153,.22);border-radius:12px;padding:1rem 1.25rem;}
+.save-banner.visible{display:block;}
+.save-banner p{font-size:.82rem;color:var(--a3);margin-bottom:.65rem;line-height:1.6;}
+.save-banner p strong{color:var(--text);}
+.save-banner pre{background:rgba(0,0,0,.45);border:1px solid var(--border);border-radius:8px;padding:.7rem;font-size:.7rem;color:var(--muted);white-space:pre-wrap;word-break:break-all;max-height:110px;overflow-y:auto;margin-bottom:.65rem;font-family:monospace;line-height:1.5;}
+.copy-html-btn{background:rgba(52,211,153,.14);border:1px solid rgba(52,211,153,.28);color:var(--a3);border-radius:8px;padding:.38rem .95rem;font-family:'Outfit',sans-serif;font-size:.78rem;font-weight:700;cursor:none;transition:all .2s;}
+.copy-html-btn:hover{background:rgba(52,211,153,.24);}
+
+/* ═══════════════════════════════════════
+   CONTACT
+═══════════════════════════════════════ */
+#contact{background:linear-gradient(180deg,transparent,rgba(52,211,153,.02) 50%,transparent);}
+.contact-grid{display:grid;grid-template-columns:1fr 1.1fr;gap:3rem;align-items:start;}
+.contact-info p{color:var(--muted);margin-bottom:2rem;font-size:.95rem;line-height:1.8;}
+.clinks{display:flex;flex-direction:column;gap:.7rem;}
+.clink{
+  display:flex;align-items:center;gap:.85rem;
+  text-decoration:none;color:var(--muted);
+  font-weight:600;font-size:.9rem;
+  transition:color .2s;padding:.5rem;border-radius:10px;
+  transition:all .2s;
+}
+.clink:hover{color:var(--a1);background:rgba(56,189,248,.05);}
+.clink-icon{
+  width:36px;height:36px;border-radius:10px;
+  background:rgba(255,255,255,.04);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:.95rem;flex-shrink:0;transition:border-color .2s;
+}
+.clink:hover .clink-icon{border-color:var(--border2);}
+.cform{
+  background:var(--card);border-radius:var(--r);
+  border:1px solid var(--border);padding:2rem;
+}
+.cform h3{font-family:'Bebas Neue',sans-serif;font-size:1.4rem;letter-spacing:.04em;color:var(--text);margin-bottom:1.25rem;}
+.fg{margin-bottom:1rem;}
+.fg label{display:block;font-size:.75rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem;}
+.fg input,.fg textarea{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:10px;padding:.72rem 1rem;
+  font-family:'Outfit',sans-serif;font-size:.9rem;color:var(--text);
+  transition:border-color .2s;
+}
+.fg input:focus,.fg textarea:focus{outline:none;border-color:var(--a1);}
+.fg textarea{resize:vertical;min-height:95px;}
+
+/* ═══════════════════════════════════════
+   FOOTER
+═══════════════════════════════════════ */
+footer{
+  background:rgba(255,255,255,.02);border-top:1px solid var(--border);
+  padding:2rem clamp(1.25rem,5vw,4rem);
+  display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:wrap;gap:1rem;position:relative;z-index:2;
+}
+.flogo{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:.08em;color:var(--text);}
+.flogo span{color:var(--a1);}
+footer p{font-size:.78rem;color:var(--muted2);}
+
+/* ═══════════════════════════════════════
+   MODALS
+═══════════════════════════════════════ */
+.modal-ov{display:none;position:fixed;inset:0;background:rgba(7,9,15,.85);backdrop-filter:blur(16px);z-index:400;align-items:center;justify-content:center;}
+.modal-ov.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:20px;padding:2.25rem;max-width:480px;width:92%;position:relative;}
+.mcl{position:absolute;top:1rem;right:1rem;background:rgba(255,255,255,.06);border:none;border-radius:50%;width:30px;height:30px;font-size:.9rem;cursor:none;color:var(--muted);font-weight:700;transition:all .2s;}
+.mcl:hover{background:rgba(255,255,255,.1);color:var(--text);}
+.modal h3{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;letter-spacing:.04em;color:var(--text);margin-bottom:1rem;}
+.modal input,.modal textarea,.modal select{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--border);
+  border-radius:10px;padding:.72rem 1rem;
+  font-family:'Outfit',sans-serif;font-size:.9rem;color:var(--text);
+  margin-bottom:.65rem;
+}
+.modal input:focus,.modal textarea:focus{outline:none;border-color:var(--a1);}
+.modal textarea{resize:none;min-height:75px;}
+.modal-acts{display:flex;gap:.65rem;justify-content:flex-end;margin-top:.25rem;}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+.toast{
+  position:fixed;bottom:1.5rem;right:1.5rem;z-index:9999;
+  background:var(--bg2);color:var(--text);
+  border:1px solid var(--border2);border-radius:12px;
+  padding:.72rem 1.2rem;font-size:.83rem;font-weight:600;
+  transform:translateY(70px);opacity:0;transition:all .32s;pointer-events:none;
+  box-shadow:0 8px 30px rgba(0,0,0,.5);
+}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast .ti{color:var(--a1);margin-right:.35rem;}
+
+/* ═══════════════════════════════════════
+   SCROLL REVEAL
+═══════════════════════════════════════ */
+.reveal{opacity:0;transform:translateY(30px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.in{opacity:1;transform:none;}
+
+/* ═══════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════ */
+@media(max-width:900px){.about-grid{grid-template-columns:1fr;}.photo-zone{max-width:320px;}.cv-grid{grid-template-columns:1fr;}.contact-grid{grid-template-columns:1fr;}}
+@media(max-width:768px){.nav-links{display:none;}.menu-btn{display:block;}.masonry{gap:1rem;}.proj-grid .proj-card,.proj-grid .add-proj,.gal-item{width:calc(50% - .5rem);min-width:260px;}}
+@media(max-width:480px){.proj-grid .proj-card,.proj-grid .add-proj,.gal-item{width:100%;}.hero-stats{gap:1.5rem;}.cv-grid{grid-template-columns:1fr;}}
+</style>
+</head>
+<body class="viewer-mode">
+
+<!-- CURSOR -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- CANVAS BACKGROUND -->
+<canvas id="bgCanvas"></canvas>
+
+<!-- OWNER GATE -->
+<div class="gate-overlay" id="gateOverlay">
+  <div class="gate-box">
+    <h3>Owner Access</h3>
+    <p>Enter your password to enable edit mode</p>
+    <input type="password" class="gate-input" id="gateInput" placeholder="••••••••" maxlength="32"/>
+    <div class="gate-err" id="gateErr">Incorrect password. Try again.</div>
+    <button class="btn-glow" style="width:100%;border-radius:10px;" onclick="checkPassword()">Unlock</button>
+    <button onclick="closeGate()" style="margin-top:.75rem;background:none;border:none;color:var(--muted);font-family:'Outfit',sans-serif;font-size:.8rem;cursor:none;width:100%;">Cancel</button>
+  </div>
+</div>
+
+<!-- ADD PROJECT MODAL -->
+<div class="modal-ov" id="projModal">
+  <div class="modal">
+    <button class="mcl" onclick="closeAddProj()">✕</button>
+    <h3>Add New Project</h3>
+    <input id="mTitle" type="text" placeholder="Project title"/>
+    <select id="mTag" style="background:rgba(255,255,255,.04);color:var(--text);">
+      <option value="">Select category</option>
+      <option value="b">Pipeline</option><option value="g">Data Warehouse</option>
+      <option value="v">ML Pipeline</option><option value="y">ETL</option>
+      <option value="b">Stream Processing</option><option value="y">Analytics</option>
+      <option value="">Other</option>
+    </select>
+    <input id="mLive" type="text" placeholder="Live / Demo link (optional)"/>
+    <input id="mGit" type="text" placeholder="GitHub link (optional)"/>
+    <textarea id="mDesc" placeholder="Short description..."></textarea>
+    <div class="modal-acts">
+      <button class="btn-outline" style="border-radius:10px;padding:.5rem 1.2rem;font-size:.85rem;" onclick="closeAddProj()">Cancel</button>
+      <button class="btn-glow" style="border-radius:10px;padding:.5rem 1.2rem;font-size:.85rem;" onclick="addProj()">Add Project</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<div class="wrap">
+
+<!-- ════════ NAV ════════ -->
+<nav>
+  <div class="logo">Emon<span>.</span></div>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#cv">Experience</a></li>
+    <li><a href="#docs">Docs</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#posts">Posts</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <button id="ownerBtn" onclick="toggleOwnerGate()">⚙ Owner</button>
+  </div>
+  <button class="menu-btn" onclick="toggleMobile()" aria-label="Menu">☰</button>
+</nav>
+
+<!-- ════════ HERO ════════ -->
+<section class="hero">
+  <div class="hero-mesh"></div>
+  <div class="hero-inner">
+    <div class="hero-pre">
+      <div class="hero-pre-line"></div>
+      <span>Data Engineer · CS Student · Builder</span>
+    </div>
+    <h1>
+      Emon Ahmed
+    </h1>
+    <p class="hero-sub">
+      As a Data Engineer I design and build the infrastructure that turns raw data into reliable insight —
+      pipelines, warehouses, streams, and everything in between.
+    </p>
+    <div class="hero-cta">
+      <a href="#projects" class="btn-glow">View My Work</a>
+      <a href="#contact" class="btn-outline">Get In Touch</a>
+    </div>
+    <div class="hero-stats">
+      <div class="hstat"><div class="n">15<span>+</span></div><div class="l">Pipelines Built</div></div>
+      <div class="hstat"><div class="n">3<span>TB+</span></div><div class="l">Data Processed</div></div>
+      <div class="hstat"><div class="n">3<span>yr</span></div><div class="l">CS Student</div></div>
+      <div class="hstat"><div class="n">∞</div><div class="l">Curiosity</div></div>
+    </div>
+  </div>
+  <div class="scroll-hint">
+    <span>Scroll</span>
+    <div class="scroll-dot"></div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-inner" id="ticker">
+    <span class="ticker-item"><span class="dot"></span>Data Ingestion<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>ETL / ELT<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>Data Warehousing<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>Stream Processing<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>Apache Spark<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>Kafka<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>dbt<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>Snowflake<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>Airflow<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>BigQuery<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>Analytics &amp; BI<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>ML Pipelines<span class="arr">→</span></span>
+    <!-- duplicate for seamless loop -->
+    <span class="ticker-item"><span class="dot"></span>Data Ingestion<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>ETL / ELT<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>Data Warehousing<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>Stream Processing<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>Apache Spark<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>Kafka<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>dbt<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>Snowflake<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>Airflow<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>BigQuery<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>Analytics &amp; BI<span class="arr">→</span></span>
+    <span class="ticker-item"><span class="dot"></span>ML Pipelines<span class="arr">→</span></span>
+  </div>
+</div>
+
+<!-- ════════ ABOUT ════════ -->
+<section id="about">
+  <div class="about-grid reveal">
+    <div class="photo-wrap">
+      <div class="photo-zone" id="photoZone" onclick="ownerAction(function(){document.getElementById('photoInput').click()})">
+        <div class="ui">📸</div>
+        <p><img src="img.jpg" alt="" width="350" height="600 > </p>
+        <small>JPG · PNG · WEBP</small>
+        <img id="photoDisplay" src="" alt="Emon Ahmed"/>
+      </div>
+      <input type="file" id="photoInput" accept="image/*" style="display:none" onchange="uploadPhoto(event)"/>
+      <!--<div class="photo-badge">Data Engineer 🔧</div>-->
+    </div>
+    <div class="about-right">
+      <p class="sec-label">About Me</p>
+      <h2 class="sec-title">Building the backbone of<br>data-driven decisions</h2>
+      <!-- ✏️ OWNER: Edit paragraphs below directly in this HTML file -->
+      <p class="about-p">I'm <strong>Emon Ahmed</strong>, a Computer Science student specialising in Data Engineering. I design systems that move, transform, and store data reliably at scale — from raw ingestion all the way to BI dashboards.</p>
+      <p class="about-p">I've worked across the full data pipeline stack: batch ETL, real-time Kafka streams, cloud warehouses, and orchestration with Airflow. I care deeply about data quality, pipeline observability, and systems that are genuinely maintainable in production.</p>
+      <p class="about-p"><strong>Currently exploring:</strong> Apache Spark optimisation, dbt best practices, Snowflake architecture, and distributed systems design patterns.</p>
+      <div class="skills-section">
+        <h4>Pipeline & Orchestration</h4>
+        <div class="stags">
+          <span class="stag b">Apache Spark</span><span class="stag b">Kafka</span>
+          <span class="stag b">Apache Airflow</span><span class="stag b">dbt</span>
+          <span class="stag b">Apache Flink</span><span class="stag b">Luigi</span>
+        </div>
+        <h4 style="margin-top:1rem;">Cloud & Warehouses</h4>
+        <div class="stags">
+          <span class="stag y">Snowflake</span><span class="stag y">BigQuery</span>
+          <span class="stag y">AWS Redshift</span><span class="stag y">AWS S3</span>
+          <span class="stag y">GCP</span><span class="stag y">Azure</span>
+        </div>
+        <h4 style="margin-top:1rem;">Languages & Tools</h4>
+        <div class="stags">
+          <span class="stag g">Python</span><span class="stag g">SQL</span>
+          <span class="stag g">PostgreSQL</span><span class="stag g">Pandas</span>
+          <span class="stag g">dask</span><span class="stag v">Docker</span>
+          <span class="stag v">Kubernetes</span><span class="stag v">Git</span>
+          <span class="stag v">Linux</span><span class="stag v">Terraform</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ CV / EXPERIENCE ════════ -->
+<!-- ✏️ OWNER: Edit ALL CV content directly in this HTML section below -->
+<section id="cv">
+  <div class="reveal">
+    <p class="sec-label">Resume</p>
+    <h2 class="sec-title">Experience & Education</h2>
+    <p class="sec-sub">My background in data engineering, studies, and what I've built so far.</p>
+  </div>
+  <div class="cv-grid reveal">
+
+    <!-- LEFT: EXPERIENCE -->
+    <div class="cv-col">
+      <h3>Experience</h3>
+
+      <!-- ✏️ Edit each cv-item to match your real experience -->
+      <div class="cv-item">
+        <div class="cv-item-title">Data Engineering Intern</div>
+        <div class="cv-item-org">Acme Analytics Ltd.</div>
+        <div class="cv-item-date">Jun 2024 – Sep 2024 · Dhaka, BD</div>
+        <div class="cv-item-desc">
+          <ul>
+            <li>Built ETL pipelines ingesting 5M+ rows/day from REST APIs into Snowflake</li>
+            <li>Reduced pipeline runtime by 40% via Spark partitioning tuning</li>
+            <li>Wrote dbt models for dimensional reporting across 3 business domains</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="cv-item">
+        <div class="cv-item-title">Junior Data Analyst (Part-Time)</div>
+        <div class="cv-item-org">Freelance / Remote</div>
+        <div class="cv-item-date">Jan 2023 – May 2024</div>
+        <div class="cv-item-desc">
+          <ul>
+            <li>Automated weekly reporting pipelines for 3 SME clients using Python + PostgreSQL</li>
+            <li>Built Power BI dashboards connected to live SQL views</li>
+          </ul>
+        </div>
+      </div>
+
+      <h3 style="margin-top:2rem;">Certifications</h3>
+
+      <div class="cv-item">
+        <div class="cv-item-title">SnowPro Core Certification</div>
+        <div class="cv-item-org">Snowflake</div>
+        <div class="cv-item-date">2024</div>
+      </div>
+      <div class="cv-item">
+        <div class="cv-item-title">Google Cloud Professional Data Engineer</div>
+        <div class="cv-item-org">Google Cloud</div>
+        <div class="cv-item-date">In Progress</div>
+      </div>
+      <div class="cv-item">
+        <div class="cv-item-title">dbt Fundamentals</div>
+        <div class="cv-item-org">dbt Labs</div>
+        <div class="cv-item-date">2023</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: EDUCATION & PROJECTS -->
+    <div class="cv-col">
+      <h3>Education</h3>
+
+      <div class="cv-item">
+        <div class="cv-item-title">BSc Computer Science</div>
+        <div class="cv-item-org">University of Dhaka</div>
+        <div class="cv-item-date">2022 – Present · CGPA 3.8 / 4.0</div>
+        <div class="cv-item-desc">
+          Relevant coursework: Databases, Distributed Systems, Algorithms, Cloud Computing, Machine Learning, Big Data Systems.
+        </div>
+      </div>
+
+      <div class="cv-item">
+        <div class="cv-item-title">Higher Secondary Certificate (HSC)</div>
+        <div class="cv-item-org">Dhaka College</div>
+        <div class="cv-item-date">2020 – 2022 · GPA 5.0 / 5.0</div>
+      </div>
+
+      <h3 style="margin-top:2rem;">Achievements</h3>
+
+      <div class="cv-item">
+        <div class="cv-item-title">1st Place — National Data Engineering Hackathon</div>
+        <div class="cv-item-org">BD Tech Council</div>
+        <div class="cv-item-date">2024</div>
+        <div class="cv-item-desc">Built a real-time fraud detection pipeline in 24h using Kafka + Flink.</div>
+      </div>
+
+      <div class="cv-item">
+        <div class="cv-item-title">Dean's List — 3 consecutive semesters</div>
+        <div class="cv-item-org">University of Dhaka</div>
+        <div class="cv-item-date">2022 – 2024</div>
+      </div>
+
+      <div class="cv-item">
+        <div class="cv-item-title">Open Source Contributor — Apache Airflow</div>
+        <div class="cv-item-org">Apache Software Foundation</div>
+        <div class="cv-item-date">2023 – Present</div>
+        <div class="cv-item-desc">Contributed 4 bug fixes and 1 new operator to the Airflow provider ecosystem.</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════ DOCUMENTS / CERTIFICATES ════════ -->
+<section id="docs">
+  <div class="reveal">
+    <p class="sec-label">Documents</p>
+    <h2 class="sec-title">Certificates & Files</h2>
+    <p class="sec-sub">Uploaded certificates, awards, and academic documents.</p>
+  </div>
+
+  <!-- Upload zone — only visible to owner -->
+  <div class="docs-owner-zone reveal" id="docsUploadZone" onclick="document.getElementById('docsInput').click()">
+    <div class="di">📁</div>
+    <h3>Upload Certificate or Document</h3>
+    <p>Click to browse · PDF, PNG, JPG, DOCX · Drag & drop supported</p>
+  </div>
+  <input type="file" id="docsInput" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" multiple style="display:none" onchange="uploadDocs(event)"/>
+
+  <!-- Viewer info note -->
+  <div class="viewer-note reveal" id="viewerNote">
+    <span>📄</span>
+    <span><strong>Certificates & documents</strong> uploaded by Emon are listed below. Click <em>View</em> to open any file.</span>
+  </div>
+
+  <div class="doc-grid reveal" id="docGrid">
+    <!-- Docs appear here when uploaded by owner -->
+    <div style="grid-column:1/-1;text-align:center;padding:3rem 0;color:var(--muted2);font-size:.875rem;" id="docsEmpty">
+      No documents uploaded yet.
+    </div>
+  </div>
+</section>
+
+<!-- ════════ PROJECTS ════════ -->
+<section id="projects">
+  <div class="reveal">
+    <p class="sec-label">Work</p>
+    <h2 class="sec-title">Projects</h2>
+    <p class="sec-sub">Data pipelines, ETL systems, warehouses, and tools I've shipped.</p>
+  </div>
+  <div class="proj-grid reveal" id="projGrid">
+
+    <div class="proj-card">
+      <div class="proj-img-area">
+        <div class="proj-img-btn" onclick="ownerAction(function(){triggerImg('p1')})">
+          <div class="ic">📊</div><span>Add screenshot</span>
+        </div>
+        <img src="" alt="" id="p1-img"/>
+        <input type="file" id="p1-file" accept="image/*" style="display:none" onchange="uploadImg(event,'p1')"/>
+      </div>
+      <div class="proj-body">
+        <span class="ptag b">Pipeline</span>
+        <div class="proj-title">Real-Time ETL Pipeline</div>
+        <div class="proj-desc">Streaming pipeline ingesting 100k events/sec via Kafka + Spark Structured Streaming into Snowflake with schema evolution support and dead-letter handling.</div>
+        <div class="proj-links"><a href="#" onclick="return false">Case Study</a><a href="#" onclick="return false">GitHub</a></div>
+      </div>
+    </div>
+
+    <div class="proj-card">
+      <div class="proj-img-area" style="background:linear-gradient(135deg,rgba(52,211,153,.1),rgba(56,189,248,.07))">
+        <div class="proj-img-btn" onclick="ownerAction(function(){triggerImg('p2')})">
+          <div class="ic">🗄️</div><span>Add screenshot</span>
+        </div>
+        <img src="" alt="" id="p2-img"/>
+        <input type="file" id="p2-file" accept="image/*" style="display:none" onchange="uploadImg(event,'p2')"/>
+      </div>
+      <div class="proj-body">
+        <span class="ptag g">Data Warehouse</span>
+        <div class="proj-title">Analytics Data Mart</div>
+        <div class="proj-desc">Dimensional model with dbt transformations, Airflow orchestration, and Power BI dashboards for university student performance analytics.</div>
+        <div class="proj-links"><a href="#" onclick="return false">Docs</a><a href="#" onclick="return false">GitHub</a></div>
+      </div>
+    </div>
+
+    <div class="proj-card">
+      <div class="proj-img-area" style="background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(251,191,36,.06))">
+        <div class="proj-img-btn" onclick="ownerAction(function(){triggerImg('p3')})">
+          <div class="ic">🤖</div><span>Add screenshot</span>
+        </div>
+        <img src="" alt="" id="p3-img"/>
+        <input type="file" id="p3-file" accept="image/*" style="display:none" onchange="uploadImg(event,'p3')"/>
+      </div>
+      <div class="proj-body">
+        <span class="ptag v">ML Pipeline</span>
+        <div class="proj-title">Feature Store & ML Pipeline</div>
+        <div class="proj-desc">Automated feature engineering pipeline feeding a churn prediction model. Built with Feast, MLflow, and scheduled on Airflow with data quality checks at every step.</div>
+        <div class="proj-links"><a href="#" onclick="return false">Demo</a><a href="#" onclick="return false">GitHub</a></div>
+      </div>
+    </div>
+
+    <!-- Add project btn — owner only -->
+    <button class="add-proj" id="addProjBtn" onclick="openAddProj()">
+      <div class="plus">＋</div>
+      <span>Add New Project</span>
+    </button>
+  </div>
+</section>
+
+<!-- ════════ GALLERY ════════ -->
+<section id="gallery">
+  <div class="reveal">
+    <p class="sec-label">Photos</p>
+    <h2 class="sec-title">Gallery</h2>
+    <p class="sec-sub">Hackathons, conferences, campus moments, and everything in between.</p>
+  </div>
+  <div class="gal-owner-bar reveal" id="galOwnerBar">
+    <div class="gal-upload-zone" onclick="document.getElementById('galInput').click()">
+      <div class="ui">🖼</div>
+      <div><p>Add photos to gallery</p><small>JPG · PNG · WEBP · multiple files supported</small></div>
+    </div>
+    <input type="file" id="galInput" accept="image/*" multiple style="display:none" onchange="uploadGal(event)"/>
+  </div>
+  <div class="masonry reveal" id="masonry">
+    <div class="gal-item">
+      <div class="gal-ph"><div class="ic">🏆</div><span>Hackathon Win</span></div>
+      <div class="gal-overlay">
+        <button class="gal-del-btn" onclick="delGalItem(this)">🗑 Remove</button>
+      </div>
+    </div>
+    <div class="gal-item" style="background:linear-gradient(135deg,rgba(52,211,153,.1),rgba(56,189,248,.08))">
+      <div class="gal-ph"><div class="ic">🎓</div><span>Campus</span></div>
+      <div class="gal-overlay"><button class="gal-del-btn" onclick="delGalItem(this)">🗑 Remove</button></div>
+    </div>
+    <div class="gal-item" style="background:linear-gradient(135deg,rgba(251,191,36,.08),rgba(167,139,250,.08))">
+      <div class="gal-ph"><div class="ic">💻</div><span>Deep Work</span></div>
+      <div class="gal-overlay"><button class="gal-del-btn" onclick="delGalItem(this)">🗑 Remove</button></div>
+    </div>
+    <div class="gal-item" style="background:linear-gradient(135deg,rgba(167,139,250,.1),rgba(52,211,153,.07))">
+      <div class="gal-ph"><div class="ic">📡</div><span>Tech Meetup</span></div>
+      <div class="gal-overlay"><button class="gal-del-btn" onclick="delGalItem(this)">🗑 Remove</button></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ POSTS / FEELINGS ════════ -->
+<section id="posts">
+  <div class="reveal">
+    <p class="sec-label">Blog & Thoughts</p>
+    <h2 class="sec-title">Posts & Feelings</h2>
+    <p class="sec-sub">Data engineering insights, learning updates, and whatever's on my mind.</p>
+  </div>
+  <!-- Compose — owner only -->
+  <div class="compose owner-visible reveal" id="composeBox">
+    <div class="compose-head">
+      <div class="avatar">EA</div>
+      <strong>What's on your mind, Emon?</strong>
+    </div>
+    <textarea id="postTxt" placeholder="Share a tech insight, project update, or feeling..."></textarea>
+    <div class="compose-foot">
+      <div class="mood-row">
+        <button class="mood-btn" onclick="pickMood(this,'😄 Happy')">😄 Happy</button>
+        <button class="mood-btn" onclick="pickMood(this,'🤔 Thinking')">🤔 Thinking</button>
+        <button class="mood-btn" onclick="pickMood(this,'💡 Insight')">💡 Insight</button>
+        <button class="mood-btn" onclick="pickMood(this,'😤 Grind')">😤 Grind</button>
+        <button class="mood-btn" onclick="pickMood(this,'🎉 Win')">🎉 Win</button>
+        <button class="mood-btn" onclick="pickMood(this,'☕ Coffee')">☕ Coffee</button>
+      </div>
+      <button class="post-btn" onclick="submitPost()">Post →</button>
+    </div>
+  </div>
+  <!-- Save banner: shows after posting with copy-to-HTML instructions -->
+  <div class="save-banner" id="saveBanner">
+    <p>✅ <strong>Post saved!</strong> It's stored in this browser. To make it permanent for <em>all visitors</em> on GitHub Pages, copy the HTML below and paste it inside <code style="color:var(--a1);font-family:monospace">&lt;div id="postsFeed"&gt;</code> in your HTML file, then push to GitHub.</p>
+    <pre id="saveBannerCode"></pre>
+    <button class="copy-html-btn" onclick="copyPostHtml()">📋 Copy HTML to clipboard</button>
+  </div>
+  <div class="posts-feed reveal" id="postsFeed">
+    <div class="post">
+      <div class="post-head">
+        <div class="avatar">EA</div>
+        <div class="post-meta">
+          <div class="post-author">Emon Ahmed <span class="pmtag">💡 Insight</span></div>
+          <div class="post-time">May 2026</div>
+        </div>
+      </div>
+      <div class="post-content">Finally got my Kafka → Spark → Snowflake pipeline running with under 2s end-to-end latency. The trick was tuning the microbatch interval and Snowflake connector pool size. Data engineering is mostly debugging what nobody documented 😄</div>
+      <div class="post-acts">
+        <button class="pact" onclick="likePost(this)"> Like</button>
+        <button class="pact"> Comment</button>
+        <button class="pdel owner-visible" onclick="delPost(this)">Delete</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ CONTACT ════════ --> 
+<section id="contact">
+  <div class="contact-grid reveal">
+    <div class="contact-info">
+      <p class="sec-label">Get In Touch</p>
+      <h2 class="sec-title">Let's build something together</h2>
+      <!-- ✏️ OWNER: Edit contact links below -->
+      <p>Looking for internships, data engineering roles, or a collaborator on your next data project. Always happy to talk pipelines and systems design.</p>
+      <div class="clinks">
+        <a href="mailto:emon@example.com" class="clink"><div class="clink-icon">📧</div>emonahmed.rup@gmail.com</a>
+        <a href="https://github.com/emonahmed" target="_blank" class="clink"><div class="clink-icon">🐙</div>github.com/emonahmed</a>
+        <a href="https://linkedin.com/in/emonahmed" target="_blank" class="clink"><div class="clink-icon">💼</div>linkedin.com/in/emonahmed</a>
+        <a href="https://twitter.com/emon_data" target="_blank" class="clink"><div class="clink-icon">🐦</div>@emon_data</a>
+      </div>
+    </div>
+    <div class="cform">
+      <h3>Send a Message</h3>
+      <div class="fg"><label>Name</label><input type="text" placeholder="Your name"/></div>
+      <div class="fg"><label>Email</label><input type="email" placeholder="your@email.com"/></div>
+      <div class="fg"><label>Subject</label><input type="text" placeholder="Internship, project, collab..."/></div>
+      <div class="fg"><label>Message</label><textarea placeholder="Tell me what you're building..."></textarea></div>
+      <button class="btn-glow" style="width:100%;border-radius:10px;" onclick="sendMsg()">Send Message </button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="flogo">Emon<span>.</span></div>
+  <p>© 2026 Emon Ahmed · Data Engineer in the Making</p>
+  <p>CS Student · Pipeline Builder · Open Source Contributor</p>
+</footer>
+
+</div><!-- /wrap -->
+
+<script>
+/* ══════════════════════════════════════
+   CONFIG — change password here
+══════════════════════════════════════ */
+var OWNER_PASSWORD = 'emon2025';  // ← Change this before deploying
+
+/* ══════════════════════════════════════
+   STATE
+══════════════════════════════════════ */
+var isOwner = false;
+var docFiles = [];
+
+/* ══════════════════════════════════════
+   CURSOR
+══════════════════════════════════════ */
+var cur = document.getElementById('cursor');
+var ring = document.getElementById('cursor-ring');
+var cx=0,cy=0,rx=0,ry=0;
+document.addEventListener('mousemove',function(e){
+  cx=e.clientX;cy=e.clientY;
+  cur.style.left=cx+'px';cur.style.top=cy+'px';
+});
+function animRing(){
+  rx+=(cx-rx)*.12; ry+=(cy-ry)*.12;
+  ring.style.left=rx+'px';ring.style.top=ry+'px';
+  requestAnimationFrame(animRing);
+}animRing();
+
+/* ══════════════════════════════════════
+   CANVAS PARTICLE BACKGROUND
+══════════════════════════════════════ */
+(function(){
+  var c=document.getElementById('bgCanvas');
+  var ctx=c.getContext('2d');
+  var W,H,pts=[],lines=[];
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight;}
+  resize();window.addEventListener('resize',resize);
+  for(var i=0;i<70;i++){
+    pts.push({
+      x:Math.random()*W,y:Math.random()*H,
+      vx:(Math.random()-.5)*.35,vy:(Math.random()-.5)*.35,
+      r:Math.random()*1.5+.5,
+      col:['rgba(56,189,248,','rgba(167,139,250,','rgba(52,211,153,'][Math.floor(Math.random()*3)]
+    });
+  }
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    /* grid lines */
+    ctx.strokeStyle='rgba(255,255,255,0.018)';ctx.lineWidth=1;
+    var gs=80;
+    for(var x=0;x<W;x+=gs){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(var y=0;y<H;y+=gs){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+    /* connect nearby pts */
+    for(var i=0;i<pts.length;i++){
+      for(var j=i+1;j<pts.length;j++){
+        var dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
+        if(d<140){
+          ctx.beginPath();
+          ctx.strokeStyle='rgba(56,189,248,'+(0.06*(1-d/140))+')';
+          ctx.lineWidth=.6;
+          ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);ctx.stroke();
+        }
+      }
+      var p=pts[i];
+      ctx.beginPath();
+      ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=p.col+'0.6)';ctx.fill();
+      p.x+=p.vx;p.y+=p.vy;
+      if(p.x<0||p.x>W)p.vx*=-1;
+      if(p.y<0||p.y>H)p.vy*=-1;
+    }
+    requestAnimationFrame(draw);
+  }draw();
+})();
+
+/* ══════════════════════════════════════
+   SCROLL REVEAL
+══════════════════════════════════════ */
+var revEls=document.querySelectorAll('.reveal');
+var obs=new IntersectionObserver(function(entries){
+  entries.forEach(function(e){if(e.isIntersecting){e.target.classList.add('in');}});
+},{threshold:.08});
+revEls.forEach(function(el){obs.observe(el);});
+
+/* ══════════════════════════════════════
+   TOAST
+══════════════════════════════════════ */
+function toast(msg){
+  var t=document.getElementById('toast');
+  t.innerHTML='<span class="ti">✦</span>'+msg;
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2800);
+}
+
+/* ══════════════════════════════════════
+   OWNER GATE
+══════════════════════════════════════ */
+function toggleOwnerGate(){
+  if(isOwner){lockOwner();return;}
+  document.getElementById('gateOverlay').classList.add('open');
+  setTimeout(function(){document.getElementById('gateInput').focus();},200);
+}
+function closeGate(){
+  document.getElementById('gateOverlay').classList.remove('open');
+  document.getElementById('gateInput').value='';
+  document.getElementById('gateErr').style.display='none';
+}
+document.getElementById('gateInput').addEventListener('keydown',function(e){if(e.key==='Enter')checkPassword();});
+function checkPassword(){
+  var v=document.getElementById('gateInput').value;
+  if(v===OWNER_PASSWORD){
+    isOwner=true;
+    closeGate();
+    activateOwner();
+  } else {
+    document.getElementById('gateErr').style.display='block';
+    document.getElementById('gateInput').value='';
+    document.getElementById('gateInput').focus();
+  }
+}
+function activateOwner(){
+  document.body.classList.remove('viewer-mode');
+  document.getElementById('ownerBtn').classList.add('active');
+  document.getElementById('ownerBtn').textContent='✓ Owner Mode';
+  /* show owner-only elements */
+  document.getElementById('docsUploadZone').classList.add('visible');
+  document.getElementById('viewerNote').classList.add('hidden');
+  document.getElementById('galOwnerBar').classList.add('visible');
+  document.getElementById('composeBox').style.display='block';
+  document.getElementById('addProjBtn').classList.add('owner-visible');
+  document.querySelectorAll('.pdel').forEach(function(e){e.classList.add('owner-visible');});
+  document.querySelectorAll('.doc-del-btn').forEach(function(e){e.classList.add('visible');});
+  document.querySelectorAll('.gal-del-btn').forEach(function(e){e.classList.add('owner-visible');});
+  document.getElementById('photoZone').style.cursor='none';
+  toast('Owner mode activated 🔓');
+}
+function lockOwner(){
+  isOwner=false;
+  document.body.classList.add('viewer-mode');
+  document.getElementById('ownerBtn').classList.remove('active');
+  document.getElementById('ownerBtn').textContent='⚙ Owner';
+  document.getElementById('docsUploadZone').classList.remove('visible');
+  document.getElementById('viewerNote').classList.remove('hidden');
+  document.getElementById('galOwnerBar').classList.remove('visible');
+  document.getElementById('composeBox').style.display='none';
+  document.getElementById('addProjBtn').classList.remove('owner-visible');
+  document.querySelectorAll('.pdel').forEach(function(e){e.classList.remove('owner-visible');});
+  document.querySelectorAll('.doc-del-btn').forEach(function(e){e.classList.remove('visible');});
+  document.querySelectorAll('.gal-del-btn').forEach(function(e){e.classList.remove('owner-visible');});
+  toast('Locked — viewer mode');
+}
+function ownerAction(fn){if(isOwner)fn();}
+
+/* ══════════════════════════════════════
+   PHOTO UPLOAD (owner only)
+══════════════════════════════════════ */
+function uploadPhoto(e){
+  var f=e.target.files[0];if(!f)return;
+  var d=document.getElementById('photoDisplay');
+  d.src=URL.createObjectURL(f);d.style.display='block';
+  document.getElementById('photoZone').style.border='none';
+  toast('Profile photo updated 📸');
+}
+
+/* ══════════════════════════════════════
+   DOCUMENTS UPLOAD (owner only)
+══════════════════════════════════════ */
+function uploadDocs(e){
+  if(!isOwner)return;
+  Array.from(e.target.files).forEach(function(f){
+    docFiles.push(f);
+    renderDoc(f,docFiles.length-1);
+  });
+  document.getElementById('docsEmpty').style.display='none';
+  toast(e.target.files.length+' document(s) added 📄');
+}
+function renderDoc(f,i){
+  var grid=document.getElementById('docGrid');
+  var s=f.size>1048576?(f.size/1048576).toFixed(1)+' MB':Math.round(f.size/1024)+' KB';
+  var icon=f.type.includes('pdf')?'📄':f.type.includes('image')?'🖼':'📝';
+  var card=document.createElement('div');card.className='doc-card';
+  card.dataset.idx=i;
+  card.innerHTML='<div class="doc-icon">'+icon+'</div>'
+    +'<div><div class="doc-name">'+f.name+'</div><div class="doc-meta">'+s+'</div></div>'
+    +'<div class="doc-actions">'
+    +'<button class="doc-view-btn" onclick="viewDoc('+i+')">View</button>'
+    +'<button class="doc-del-btn'+(isOwner?' visible':'')+'" onclick="delDoc(this,'+i+')">✕</button>'
+    +'</div>';
+  grid.appendChild(card);
+}
+function viewDoc(i){if(docFiles[i])window.open(URL.createObjectURL(docFiles[i]),'_blank');}
+function delDoc(btn,i){
+  if(!isOwner)return;
+  btn.closest('.doc-card').remove();
+  docFiles[i]=null;
+  if(!docFiles.filter(Boolean).length)document.getElementById('docsEmpty').style.display='block';
+  toast('Document removed');
+}
+var dropZone=document.getElementById('docsUploadZone');
+dropZone.addEventListener('dragover',function(e){e.preventDefault();this.style.borderColor='var(--a1)';});
+dropZone.addEventListener('dragleave',function(){this.style.borderColor='';});
+dropZone.addEventListener('drop',function(e){
+  e.preventDefault();this.style.borderColor='';
+  if(!isOwner)return;
+  Array.from(e.dataTransfer.files).forEach(function(f){docFiles.push(f);renderDoc(f,docFiles.length-1);});
+  document.getElementById('docsEmpty').style.display='none';
+  toast('Document(s) uploaded 📄');
+});
+
+/* ══════════════════════════════════════
+   PROJECT IMAGE UPLOAD
+══════════════════════════════════════ */
+function triggerImg(id){document.getElementById(id+'-file').click();}
+function uploadImg(e,id){
+  if(!isOwner)return;
+  var f=e.target.files[0];if(!f)return;
+  var img=document.getElementById(id+'-img');
+  img.src=URL.createObjectURL(f);img.style.display='block';
+  var btn=document.getElementById(id+'-up');if(btn)btn.style.display='none';
+  toast('Screenshot added 🖼');
+}
+
+/* ══════════════════════════════════════
+   ADD PROJECT (owner)
+══════════════════════════════════════ */
+function openAddProj(){if(isOwner)document.getElementById('projModal').classList.add('open');}
+function closeAddProj(){document.getElementById('projModal').classList.remove('open');}
+function addProj(){
+  if(!isOwner)return;
+  var title=document.getElementById('mTitle').value.trim();
+  var tagClass=document.getElementById('mTag').value;
+  var live=document.getElementById('mLive').value.trim();
+  var git=document.getElementById('mGit').value.trim();
+  var desc=document.getElementById('mDesc').value.trim();
+  if(!title||!desc){toast('Fill title & description!');return;}
+  var pid='p'+Date.now();
+  var grid=document.getElementById('projGrid');
+  var addBtn=document.getElementById('addProjBtn');
+  var tagName=document.getElementById('mTag').options[document.getElementById('mTag').selectedIndex].text||'Project';
+  var links=(live?'<a href="'+live+'" target="_blank">Live</a>':'')+(git?'<a href="'+git+'" target="_blank">GitHub</a>':'');
+  var card=document.createElement('div');card.className='proj-card';
+  card.innerHTML='<div class="proj-img-area"><div class="proj-img-btn" onclick="ownerAction(function(){triggerImg(\''+pid+'\')})" id="'+pid+'-up"><div class="ic">📊</div><span>Add screenshot</span></div><img src="" alt="" id="'+pid+'-img"/><input type="file" id="'+pid+'-file" accept="image/*" style="display:none" onchange="uploadImg(event,\''+pid+'\')" /></div><div class="proj-body"><span class="ptag '+tagClass+'">'+tagName+'</span><div class="proj-title">'+title+'</div><div class="proj-desc">'+desc+'</div><div class="proj-links">'+links+'</div></div>';
+  grid.insertBefore(card,addBtn);
+  ['mTitle','mDesc','mLive','mGit'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('mTag').selectedIndex=0;
+  closeAddProj();toast('Project added 🚀');
+}
+
+/* ══════════════════════════════════════
+   GALLERY
+══════════════════════════════════════ */
+function uploadGal(e){
+  if(!isOwner)return;
+  Array.from(e.target.files).forEach(function(f){
+    var wrap=document.createElement('div');wrap.className='gal-item';
+    var img=document.createElement('img');img.src=URL.createObjectURL(f);img.alt='Gallery';img.style.width='100%';img.style.display='block';
+    var ov=document.createElement('div');ov.className='gal-overlay';
+    var btn=document.createElement('button');btn.className='gal-del-btn owner-visible';btn.textContent='🗑 Remove';btn.setAttribute('onclick','delGalItem(this)');
+    ov.appendChild(btn);wrap.appendChild(img);wrap.appendChild(ov);
+    document.getElementById('masonry').appendChild(wrap);
+  });
+  toast(e.target.files.length+' photo(s) added 📸');
+}
+function delGalItem(btn){
+  if(!isOwner)return;
+  var item=btn.closest('.gal-item');
+  item.style.cssText='opacity:0;transform:scale(.9);transition:all .3s;';
+  setTimeout(function(){item.remove();},300);
+  toast('Photo removed');
+}
+
+/* ══════════════════════════════════════
+   POSTS — localStorage persistence
+══════════════════════════════════════ */
+var mood='';
+var LS_KEY='emon_posts_v1';
+
+/* Build post HTML string from data object */
+function buildPostHTML(data){
+  var mTag=data.mood?'<span class="pmtag">'+data.mood+'</span>':'';
+  return '<div class="post" data-id="'+data.id+'">'
+    +'<div class="post-head"><div class="avatar">EA</div>'
+    +'<div class="post-meta">'
+    +'<div class="post-author">Emon Ahmed '+mTag+'</div>'
+    +'<div class="post-time">'+data.time+'</div>'
+    +'</div></div>'
+    +'<div class="post-content">'+data.content+'</div>'
+    +'<div class="post-acts">'
+    +'<button class="pact" onclick="likePost(this)">❤️ Like</button>'
+    +'<button class="pact">💬 Comment</button>'
+    +'<button class="pdel owner-visible" onclick="delPost(this)">Delete</button>'
+    +'</div></div>';
+}
+
+/* Load saved posts from localStorage and prepend to feed */
+function loadSavedPosts(){
+  try{
+    var saved=JSON.parse(localStorage.getItem(LS_KEY)||'[]');
+    var feed=document.getElementById('postsFeed');
+    /* prepend newest first, before hardcoded posts */
+    saved.slice().reverse().forEach(function(d){
+      var el=document.createElement('div');
+      el.outerHTML; /* dummy */
+      var tmp=document.createElement('template');
+      tmp.innerHTML=buildPostHTML(d);
+      feed.insertBefore(tmp.content.firstChild,feed.firstChild);
+    });
+  }catch(e){}
+}
+loadSavedPosts();
+
+/* Save posts array to localStorage */
+function savePostsToLS(posts){
+  try{localStorage.setItem(LS_KEY,JSON.stringify(posts));}catch(e){}
+}
+
+/* Get current stored posts */
+function getStoredPosts(){
+  try{return JSON.parse(localStorage.getItem(LS_KEY)||'[]');}catch(e){return[];}
+}
+
+var lastPostHTML=''; /* for copy-to-HTML */
+
+function pickMood(btn,m){
+  document.querySelectorAll('.mood-btn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');mood=m;
+}
+
+function submitPost(){
+  if(!isOwner)return;
+  var txt=document.getElementById('postTxt').value.trim();
+  if(!txt){toast('Write something first!');return;}
+  var now=new Date().toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  var id='post_'+Date.now();
+  var data={id:id,mood:mood,time:now,content:txt.replace(/\n/g,'<br>')};
+
+  /* Save to localStorage */
+  var posts=getStoredPosts();
+  posts.unshift(data);
+  savePostsToLS(posts);
+
+  /* Render in feed */
+  var feed=document.getElementById('postsFeed');
+  var tmp=document.createElement('template');
+  tmp.innerHTML=buildPostHTML(data);
+  var el=tmp.content.firstChild;
+  /* apply owner-visible state */
+  if(isOwner)el.querySelector('.pdel').classList.add('owner-visible');
+  feed.insertBefore(el,feed.firstChild);
+
+  /* Show save banner with copy HTML */
+  lastPostHTML=buildPostHTML(data).replace(/owner-visible/g,'owner-visible');
+  var cleanHTML='<!-- PASTE THIS inside <div id="postsFeed"> in your HTML file -->\n'+buildPostHTML(data);
+  document.getElementById('saveBannerCode').textContent=cleanHTML;
+  document.getElementById('saveBanner').classList.add('visible');
+
+  document.getElementById('postTxt').value='';
+  document.querySelectorAll('.mood-btn').forEach(function(b){b.classList.remove('active');});
+  mood='';
+  toast('Posted & saved locally ✨');
+}
+
+function copyPostHtml(){
+  var code=document.getElementById('saveBannerCode').textContent;
+  navigator.clipboard.writeText(code).then(function(){
+    toast('HTML copied! Paste into your HTML file & push to GitHub 🚀');
+  }).catch(function(){
+    toast('Select the code above and copy manually');
+  });
+}
+
+function likePost(btn){
+  var liked=btn.textContent.includes('Liked');
+  btn.textContent=liked?'❤️ Like':'❤️ Liked!';
+  btn.style.color=liked?'':'var(--a1)';
+}
+
+function delPost(btn){
+  if(!isOwner)return;
+  var p=btn.closest('.post');
+  var id=p.dataset.id;
+  /* remove from localStorage */
+  if(id){
+    var posts=getStoredPosts().filter(function(d){return d.id!==id;});
+    savePostsToLS(posts);
+  }
+  p.style.cssText='opacity:0;transform:translateX(30px);transition:all .3s;';
+  setTimeout(function(){p.remove();},300);
+  toast('Post deleted');
+}
+
+/* ══════════════════════════════════════
+   CONTACT
+══════════════════════════════════════ */
+function sendMsg(){toast('Message sent! Emon will get back to you soon 📬');}
+
+/* ══════════════════════════════════════
+   MOBILE NAV
+══════════════════════════════════════ */
+function toggleMobile(){
+  var nl=document.querySelector('.nav-links');
+  var open=nl.style.display==='flex';
+  nl.style.cssText=open?'':
+    'display:flex;flex-direction:column;position:fixed;top:60px;left:0;right:0;background:rgba(7,9,15,.97);padding:1.5rem 2rem;border-bottom:1px solid var(--border);z-index:99;gap:1.25rem;backdrop-filter:blur(20px);';
+}
+</script>
+</body>
+</html>
