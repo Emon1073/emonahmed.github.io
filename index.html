@@ -404,7 +404,6 @@ body.viewer-mode .proj-img-area::after{content:'📊';font-size:2.5rem;position:
   border-radius:var(--r);padding:1.5rem;margin-bottom:2rem;
   display:none;
 }
-.compose.owner-visible{display:block;}
 .compose-head{display:flex;align-items:center;gap:.9rem;margin-bottom:1rem;}
 .avatar{
   width:38px;height:38px;border-radius:50%;flex-shrink:0;
@@ -991,7 +990,7 @@ footer p{font-size:.78rem;color:var(--muted2);}
     <p class="sec-sub">Data engineering insights, learning updates, and whatever's on my mind.</p>
   </div>
   <!-- Compose — owner only -->
-  <div class="compose owner-visible reveal" id="composeBox">
+  <div class="compose reveal" id="composeBox" style="display:none;">
     <div class="compose-head">
       <div class="avatar">EA</div>
       <strong>What's on your mind, Emon?</strong>
@@ -1358,10 +1357,13 @@ function saveToken(){
   if(!t){toast('Paste your token first!');return;}
   sessionStorage.setItem('gh_token',t);
   document.getElementById('tokenBar').style.display='none';
-  toast('Token saved for this session 🔑');
-  /* retry pending post if any */
-  if(window._pendingPost){submitPost();window._pendingPost=false;}
+  toast('Token saved 🔑 — you can now post!');
+  if(window._pendingPost){window._pendingPost=false;submitPost();}
 }
+document.addEventListener('DOMContentLoaded',function(){
+  var ti=document.getElementById('ghTokenInput');
+  if(ti)ti.addEventListener('keydown',function(e){if(e.key==='Enter')saveToken();});
+});
 
 /* Sync status bar helper */
 function syncStatus(msg,color){
