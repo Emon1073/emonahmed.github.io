@@ -1441,17 +1441,6 @@ function syncInfo(msg){syncStatus('⟳ '+msg,'56,189,248');}
 /* ── Build post card HTML ── */
 function buildPostHTML(d){
   var mTag=d.mood?'<span class="pmtag">'+d.mood+'</span>':'';
-  var likes=d.likes||0;
-  var comments=d.comments||[];
-  var commentsHTML=comments.map(function(c){
-    return '<div class="comment-item">'
-      +'<div class="comment-avatar">'+c.name.charAt(0).toUpperCase()+'</div>'
-      +'<div class="comment-bubble">'
-      +'<div class="comment-name">'+escHtml(c.name)+'</div>'
-      +'<div class="comment-text">'+escHtml(c.text)+'</div>'
-      +'<div class="comment-time">'+c.time+'</div>'
-      +'</div></div>';
-  }).join('');
   return '<div class="post" data-id="'+d.id+'">'
     +'<div class="post-head"><div class="avatar">EA</div>'
     +'<div class="post-meta">'
@@ -1460,16 +1449,16 @@ function buildPostHTML(d){
     +'</div></div>'
     +'<div class="post-content">'+d.content+'</div>'
     +'<div class="post-acts">'
-    +'<button class="pact like-btn" onclick="likePost(this)">❤️ <span class="like-count">'+likes+'</span> Like'+(likes===1?'':'s')+'</button>'
-    +'<button class="pact comment-btn" onclick="toggleComments(this)">💬 <span class="comment-count">'+comments.length+'</span> Comment'+(comments.length===1?'':'s')+'</button>'
+    +'<button class="pact like-btn" onclick="likePost(this)">❤️ <span class="like-count">0</span><span class="like-label"> Likes</span></button>'
+    +'<button class="pact comment-btn" onclick="toggleComments(this)">💬 <span class="comment-count">0</span><span class="comment-label"> Comments</span></button>'
     +'<button class="pdel" onclick="delPost(this)">Delete</button>'
     +'</div>'
     +'<div class="comments-wrap">'
-    +'<div class="comments-list">'+commentsHTML+'</div>'
+    +'<div class="comments-list"></div>'
     +'<div class="comment-input-row">'
+    +'<input class="comment-name-input" placeholder="Your name"/>'
     +'<input class="comment-input" placeholder="Write a comment..." onkeydown="if(event.key===\'Enter\')submitComment(this)"/>'
-    +'<input class="comment-name-input" placeholder="Your name" style="width:110px;background:var(--bg2);border:1px solid var(--border);border-radius:100px;padding:.4rem .85rem;font-family:\'Outfit\',sans-serif;font-size:.78rem;color:var(--text);" />'
-    +'<button class="comment-submit" onclick="submitComment(this.previousElementSibling.previousElementSibling)">Send</button>'
+    +'<button class="comment-submit" onclick="submitComment(this.previousElementSibling)">Send</button>'
     +'</div></div>'
     +'</div>';
 }
@@ -1479,18 +1468,19 @@ function renderPosts(posts){
   var feed=document.getElementById('postsFeed');
   feed.innerHTML='';
   if(!posts||!posts.length){
-    feed.innerHTML='<div style="text-align:center;padding:3rem 0;color:var(--muted2);font-size:.875rem;">No posts yet. Be the first to post!</div>';
+    feed.innerHTML='<div style="text-align:center;padding:3rem 0;color:var(--muted2);font-size:.875rem;">No posts yet.</div>';
     return;
   }
   posts.forEach(function(d){
     var tmp=document.createElement('template');
     tmp.innerHTML=buildPostHTML(d);
     var el=tmp.content.firstChild;
-    /* show delete btn only if owner */
-    if(isOwner) el.querySelector('.pdel').classList.add('owner-visible');
+    if(isOwner)el.querySelector('.pdel').classList.add('owner-visible');
     feed.appendChild(el);
   });
   restoreLikes();
+  /* Load likes & comments from JSONBin and apply permanently */
+  loadInteractions().then(function(){applyInteractions();});
 }
 
 /* ── Load posts.json from GitHub (public raw URL, no auth needed) ── */
@@ -1616,40 +1606,79 @@ function submitPost(){
 /* ── Escape HTML helper ── */
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-/* ── Like post (stored in localStorage per visitor, count saved to GitHub by owner) ── */
-function likePost(btn){
-  var post=btn.closest('.post');
-  var id=post.dataset.id;
-  var likedKey='liked_'+id;
-  var liked=localStorage.getItem(likedKey);
-  var countEl=btn.querySelector('.like-count');
-  var count=parseInt(countEl.textContent)||0;
-  if(liked){
-    /* unlike */
-    localStorage.removeItem(likedKey);
-    count=Math.max(0,count-1);
-    btn.classList.remove('liked');
-    countEl.textContent=count;
-    btn.lastChild.textContent=' Like'+(count===1?'':'s');
-  } else {
-    /* like */
-    localStorage.setItem(likedKey,'1');
-    count++;
-    btn.classList.add('liked');
-    countEl.textContent=count;
-    btn.lastChild.textContent=' Like'+(count===1?'':'s');
-  }
-  /* Save updated like count to GitHub if owner */
-  if(isOwner && getToken()){
-    var token=getToken();
-    fetchCurrentPosts(token).then(function(posts){
-      var updated=posts.map(function(p){return p.id===id?Object.assign({},p,{likes:count}):p;});
-      commitPosts(updated,token,'Update likes on post '+id);
-    });
-  }
+/* ══════════════════════════════════════
+   JSONBIN — permanent storage for
+   likes, comments & contact messages
+   Credentials: Emon Ahmed / jsonbin.io
+══════════════════════════════════════ */
+var JB_KEY       = '$2a$10$MHhu9c4Qin3Nyr9jt9V3d.CkPZlVEues8aZ5RXlruqaTJv5UsTWKi';
+var JB_BIN_INTER = '6a0a5526adc21f119ab61465'; /* likes & comments */
+var JB_BIN_MSGS  = '6a0a556fc0954111d83b4b2a'; /* contact messages */
+var JB_BASE      = 'https://api.jsonbin.io/v3/b/';
+var interCache   = null;  /* {postId:{likes:N,comments:[...]}} */
+var msgsCache    = null;  /* [{id,name,email,...}]             */
+
+function jbRead(binId){
+  return fetch(JB_BASE+binId+'/latest',{
+    headers:{'X-Master-Key':JB_KEY,'X-Bin-Meta':'false'}
+  }).then(function(r){return r.json();})
+    .then(function(r){return r&&r.record!==undefined?r.record:r;})
+    .catch(function(){return null;});
+}
+function jbWrite(binId,data){
+  return fetch(JB_BASE+binId,{
+    method:'PUT',
+    headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY},
+    body:JSON.stringify(data)
+  }).then(function(r){return r.json();}).catch(function(){});
 }
 
-/* Restore liked state from localStorage on load */
+/* ── Load interactions from JSONBin ── */
+function loadInteractions(){
+  return jbRead(JB_BIN_INTER).then(function(d){
+    interCache=(d&&typeof d==='object'&&!Array.isArray(d))?d:{};
+    return interCache;
+  }).catch(function(){interCache={};return{};});
+}
+
+/* ── Overlay saved likes & comments onto rendered posts ── */
+function applyInteractions(){
+  if(!interCache)return;
+  document.querySelectorAll('.post').forEach(function(post){
+    var id=post.dataset.id;
+    if(!id||!interCache[id])return;
+    var data=interCache[id];
+    /* likes */
+    var likes=data.likes||0;
+    var likeBtn=post.querySelector('.like-btn');
+    if(likeBtn){
+      likeBtn.querySelector('.like-count').textContent=likes;
+      likeBtn.querySelector('.like-label').textContent=' Like'+(likes===1?'':'s');
+      if(localStorage.getItem('liked_'+id))likeBtn.classList.add('liked');
+    }
+    /* comments */
+    var comments=data.comments||[];
+    var commentBtn=post.querySelector('.comment-btn');
+    if(commentBtn){
+      commentBtn.querySelector('.comment-count').textContent=comments.length;
+      commentBtn.querySelector('.comment-label').textContent=' Comment'+(comments.length===1?'':'s');
+    }
+    var list=post.querySelector('.comments-list');
+    if(list){
+      list.innerHTML=comments.map(function(c){
+        return '<div class="comment-item">'
+          +'<div class="comment-avatar">'+escHtml(c.name.charAt(0).toUpperCase())+'</div>'
+          +'<div class="comment-bubble">'
+          +'<div class="comment-name">'+escHtml(c.name)+'</div>'
+          +'<div class="comment-text">'+escHtml(c.text)+'</div>'
+          +'<div class="comment-time">'+c.time+'</div>'
+          +'</div></div>';
+      }).join('');
+    }
+  });
+}
+
+/* ── Restore liked button state from localStorage ── */
 function restoreLikes(){
   document.querySelectorAll('.post').forEach(function(post){
     var id=post.dataset.id;
@@ -1660,30 +1689,55 @@ function restoreLikes(){
   });
 }
 
-/* ── Toggle comments section ── */
+/* ── Like / Unlike — saves permanently to JSONBin ── */
+function likePost(btn){
+  var post=btn.closest('.post');
+  var id=post.dataset.id;
+  var alreadyLiked=!!localStorage.getItem('liked_'+id);
+  var countEl=btn.querySelector('.like-count');
+  var labelEl=btn.querySelector('.like-label');
+  var count=parseInt(countEl.textContent)||0;
+  if(alreadyLiked){
+    count=Math.max(0,count-1);
+    localStorage.removeItem('liked_'+id);
+    btn.classList.remove('liked');
+  } else {
+    count++;
+    localStorage.setItem('liked_'+id,'1');
+    btn.classList.add('liked');
+  }
+  countEl.textContent=count;
+  if(labelEl)labelEl.textContent=' Like'+(count===1?'':'s');
+  /* Save to JSONBin — all visitors see the updated count */
+  if(!interCache)interCache={};
+  if(!interCache[id])interCache[id]={likes:0,comments:[]};
+  interCache[id].likes=count;
+  jbWrite(JB_BIN_INTER,interCache);
+}
+
+/* ── Toggle comments open/close ── */
 function toggleComments(btn){
   var wrap=btn.closest('.post').querySelector('.comments-wrap');
   var open=wrap.classList.toggle('open');
   btn.classList.toggle('commented',open);
-  if(open) wrap.querySelector('.comment-input').focus();
+  if(open)wrap.querySelector('.comment-input').focus();
 }
 
-/* ── Submit comment ── */
+/* ── Submit comment — saves permanently to JSONBin ── */
 function submitComment(input){
   var text=input.value.trim();
-  var nameInput=input.nextElementSibling;
-  var name=nameInput.value.trim()||'Anonymous';
-  if(!text){input.focus();return;}
+  var nameInput=input.previousElementSibling;
+  var name=(nameInput&&nameInput.value.trim())||'Anonymous';
+  if(!text){input.focus();toast('Write your comment first!');return;}
   var post=input.closest('.post');
   var id=post.dataset.id;
-  var now=new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
+  var now=new Date().toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
   var comment={name:name,text:text,time:now};
-
   /* Render immediately */
   var list=post.querySelector('.comments-list');
   var el=document.createElement('div');
   el.className='comment-item';
-  el.innerHTML='<div class="comment-avatar">'+name.charAt(0).toUpperCase()+'</div>'
+  el.innerHTML='<div class="comment-avatar">'+escHtml(name.charAt(0).toUpperCase())+'</div>'
     +'<div class="comment-bubble">'
     +'<div class="comment-name">'+escHtml(name)+'</div>'
     +'<div class="comment-text">'+escHtml(text)+'</div>'
@@ -1691,46 +1745,33 @@ function submitComment(input){
     +'</div>';
   list.appendChild(el);
   input.value='';
-
-  /* Update comment count badge */
+  /* Update count badge */
   var countEl=post.querySelector('.comment-count');
+  var labelEl=post.querySelector('.comment-label');
   var count=(parseInt(countEl.textContent)||0)+1;
   countEl.textContent=count;
-  post.querySelector('.comment-btn').lastChild.textContent=' Comment'+(count===1?'':'s');
-
-  /* Save to GitHub (everyone's comments, stored in post data) */
-  var token=getToken();
-  if(token){
-    fetchCurrentPosts(token).then(function(posts){
-      var updated=posts.map(function(p){
-        if(p.id===id){
-          var comments=p.comments||[];
-          comments.push(comment);
-          return Object.assign({},p,{comments:comments});
-        }
-        return p;
-      });
-      commitPosts(updated,token,'Add comment on post '+id);
-    }).catch(function(){/* silent fail - comment still shows */});
-  }
-  toast('Comment posted 💬');
+  if(labelEl)labelEl.textContent=' Comment'+(count===1?'':'s');
+  /* Save to JSONBin — permanent for all visitors */
+  if(!interCache)interCache={};
+  if(!interCache[id])interCache[id]={likes:0,comments:[]};
+  interCache[id].comments.push(comment);
+  jbWrite(JB_BIN_INTER,interCache).then(function(){
+    toast('Comment saved permanently 💬');
+  }).catch(function(){
+    toast('Comment shown — check internet connection');
+  });
 }
 
 /* ══════════════════════════════════════
-   CONTACT FORM — saves to messages.json
+   CONTACT FORM — saves to JSONBin
 ══════════════════════════════════════ */
-var GH_MSG_FILE='messages.json';
-var GH_MSG_API='https://api.github.com/repos/'+GH_USER+'/'+GH_REPO+'/contents/'+GH_MSG_FILE;
-var GH_MSG_RAW='https://raw.githubusercontent.com/'+GH_USER+'/'+GH_REPO+'/'+GH_BRANCH+'/'+GH_MSG_FILE;
-
 function formStatus(msg,type){
   var el=document.getElementById('formStatus');
+  if(!el)return;
   var colors={ok:'52,211,153',err:'220,38,38',info:'2,132,199'};
   var c=colors[type]||colors.info;
-  el.style.display='block';
-  el.style.background='rgba('+c+',.08)';
-  el.style.border='1px solid rgba('+c+',.25)';
-  el.style.color='rgb('+c+')';
+  el.style.cssText='display:block;border-radius:10px;padding:.6rem 1rem;font-size:.82rem;font-weight:600;'
+    +'background:rgba('+c+',.09);border:1px solid rgba('+c+',.28);color:rgb('+c+');margin-bottom:1rem;';
   el.textContent=msg;
 }
 
@@ -1741,94 +1782,54 @@ function sendMsg(){
   var body=document.getElementById('msgBody').value.trim();
   if(!name||!email||!body){formStatus('Please fill in name, email and message.','err');return;}
   if(!/\S+@\S+\.\S+/.test(email)){formStatus('Please enter a valid email address.','err');return;}
-
   var btn=document.getElementById('sendMsgBtn');
   btn.textContent='Sending...';btn.disabled=true;
-  formStatus('Sending your message...','info');
-
+  formStatus('Sending...','info');
   var now=new Date().toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  var msg={id:'msg_'+Date.now(),name:name,email:email,subject:subject||'(no subject)',body:body,time:now,read:false};
-
-  /* Fetch existing messages.json, append, commit */
-  fetch(GH_MSG_RAW+'?nocache='+Date.now())
-    .then(function(r){return r.status===404?[]:r.json();})
-    .catch(function(){return[];})
-    .then(function(msgs){
-      msgs.unshift(msg);
-      var content=btoa(unescape(encodeURIComponent(JSON.stringify(msgs,null,2))));
-      /* get SHA */
-      return fetch(GH_MSG_API,{headers:{'Authorization':'token anonymous','Accept':'application/vnd.github.v3+json'}})
-        .then(function(r){return r.status===404?null:r.json();})
-        .then(function(d){
-          var body2={message:'New message from '+name,content:content,branch:GH_BRANCH};
-          if(d&&d.sha)body2.sha=d.sha;
-          /* Use a public write token if set, else use owner token if logged in, else store locally */
-          var tok=getToken();
-          if(!tok){
-            /* No token available — store in localStorage as fallback */
-            var stored=JSON.parse(localStorage.getItem('emon_msgs')||'[]');
-            stored.unshift(msg);
-            localStorage.setItem('emon_msgs',JSON.stringify(stored));
-            return {ok:true,_local:true};
-          }
-          return fetch(GH_MSG_API,{
-            method:'PUT',
-            headers:{'Authorization':'token '+tok,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
-            body:JSON.stringify(body2)
-          });
-        });
-    })
-    .then(function(res){
-      btn.textContent='Send Message 🚀';btn.disabled=false;
-      if(res&&res.ok){
-        formStatus('✓ Message sent! Emon will get back to you soon.','ok');
-        ['msgName','msgEmail','msgSubject','msgBody'].forEach(function(id){document.getElementById(id).value='';});
-        toast('Message delivered 📬');
-        /* refresh inbox if owner open */
-        if(isOwner)loadInbox();
-      } else {
-        formStatus('Something went wrong. Please email directly.','err');
-      }
-    })
-    .catch(function(){
-      btn.textContent='Send Message 🚀';btn.disabled=false;
-      /* fallback to localStorage */
-      var stored=JSON.parse(localStorage.getItem('emon_msgs')||'[]');
-      stored.unshift(msg);
-      localStorage.setItem('emon_msgs',JSON.stringify(stored));
-      formStatus('✓ Message sent!','ok');
-      ['msgName','msgEmail','msgSubject','msgBody'].forEach(function(id){document.getElementById(id).value='';});
-      toast('Message delivered 📬');
+  var msg={id:'msg_'+Date.now(),name:name,email:email,subject:subject||'(no subject)',body:body,time:now};
+  /* Read current msgs → prepend new → write back */
+  jbRead(JB_BIN_MSGS).then(function(d){
+    var list=Array.isArray(d)?d:[];
+    list.unshift(msg);
+    return jbWrite(JB_BIN_MSGS,list);
+  }).then(function(){
+    btn.textContent='Send Message 🚀';btn.disabled=false;
+    formStatus('✓ Message sent! Emon will get back to you soon 😊','ok');
+    ['msgName','msgEmail','msgSubject','msgBody'].forEach(function(i){
+      var el=document.getElementById(i);if(el)el.value='';
     });
+    toast('Message delivered 📬');
+    if(isOwner)loadInbox();
+  }).catch(function(){
+    btn.textContent='Send Message 🚀';btn.disabled=false;
+    formStatus('Could not send. Email directly: emonahmed.rup@gmail.com','err');
+  });
 }
 
-/* ── Load inbox (owner only) ── */
+/* ── Inbox — owner only ── */
 function loadInbox(){
-  var token=getToken();
   var list=document.getElementById('inboxList');
+  if(!list)return;
   list.innerHTML='<div class="inbox-empty">Loading...</div>';
-
-  /* Try GitHub first, fallback to localStorage */
-  var ghPromise=token
-    ?fetch(GH_MSG_RAW+'?nocache='+Date.now()).then(function(r){return r.status===404?[]:r.json();}).catch(function(){return[];})
-    :Promise.resolve([]);
-  var local=JSON.parse(localStorage.getItem('emon_msgs')||'[]');
-
-  ghPromise.then(function(ghMsgs){
-    /* Merge — deduplicate by id */
-    var seen={};var all=ghMsgs.concat(local).filter(function(m){return seen[m.id]?false:(seen[m.id]=true);});
-    all.sort(function(a,b){return b.id.localeCompare(a.id);});
-    renderInbox(all);
+  jbRead(JB_BIN_MSGS).then(function(d){
+    var msgs=Array.isArray(d)?d:[];
+    msgsCache=msgs;
+    renderInbox(msgs);
+  }).catch(function(){
+    list.innerHTML='<div class="inbox-empty">Could not load messages.</div>';
   });
 }
 
 function renderInbox(msgs){
   var list=document.getElementById('inboxList');
-  var count=document.getElementById('inboxCount');
-  count.textContent=msgs.length;
-  if(!msgs.length){list.innerHTML='<div class="inbox-empty">No messages yet.</div>';return;}
-  list.innerHTML=msgs.map(function(m,i){
-    return '<div class="msg-card" data-idx="'+i+'">'
+  var countEl=document.getElementById('inboxCount');
+  if(countEl)countEl.textContent=msgs.length;
+  if(!msgs||!msgs.length){
+    list.innerHTML='<div class="inbox-empty">No messages yet — share your portfolio! 🎉</div>';
+    return;
+  }
+  list.innerHTML=msgs.map(function(m){
+    return '<div class="msg-card" data-id="'+m.id+'">'
       +'<button class="msg-del" onclick="delMsg(this,\''+m.id+'\')">✕</button>'
       +'<div class="msg-card-top">'
       +'<span class="msg-from">'+escHtml(m.name)+'</span>'
@@ -1843,29 +1844,36 @@ function renderInbox(msgs){
 
 function toggleInbox(){
   var panel=document.getElementById('inboxPanel');
+  if(!panel)return;
   var open=panel.classList.toggle('open');
   if(open)loadInbox();
 }
 
 function delMsg(btn,id){
-  btn.closest('.msg-card').style.cssText='opacity:0;transition:all .3s;';
-  setTimeout(function(){btn.closest('.msg-card').remove();},300);
-  /* Remove from localStorage */
-  var stored=JSON.parse(localStorage.getItem('emon_msgs')||'[]').filter(function(m){return m.id!==id;});
-  localStorage.setItem('emon_msgs',JSON.stringify(stored));
-  /* Update count */
-  var c=document.getElementById('inboxCount');
-  c.textContent=Math.max(0,(parseInt(c.textContent)||1)-1);
-  toast('Message removed');
+  var card=btn.closest('.msg-card');
+  card.style.cssText='opacity:0;transition:all .3s;';
+  setTimeout(function(){card.remove();},300);
+  if(msgsCache){
+    msgsCache=msgsCache.filter(function(m){return m.id!==id;});
+    jbWrite(JB_BIN_MSGS,msgsCache);
+    var c=document.getElementById('inboxCount');
+    if(c)c.textContent=msgsCache.length;
+  }
+  toast('Message deleted 🗑');
 }
 
-/* Show inbox btn + msg dot when owner activates */
 function checkUnreadMsgs(){
-  var stored=JSON.parse(localStorage.getItem('emon_msgs')||'[]');
-  if(stored.length){
-    document.getElementById('msgDot').classList.add('show');
-  }
+  jbRead(JB_BIN_MSGS).then(function(d){
+    var msgs=Array.isArray(d)?d:[];
+    if(msgs.length>0){
+      var dot=document.getElementById('msgDot');
+      var cnt=document.getElementById('inboxCount');
+      if(dot)dot.classList.add('show');
+      if(cnt)cnt.textContent=msgs.length;
+    }
+  }).catch(function(){});
 }
+
 function delPost(btn){
   if(!isOwner)return;
   var token=getToken();
@@ -1878,28 +1886,24 @@ function delPost(btn){
   var p=btn.closest('.post');
   var id=p.dataset.id;
   if(!confirm('Delete this post? This cannot be undone.'))return;
-
   syncInfo('Deleting post from GitHub...');
-
   fetchCurrentPosts(token).then(function(posts){
     var updated=posts.filter(function(d){return d.id!==id;});
     return commitPosts(updated,token,'Delete post '+id).then(function(res){
       if(!res.ok)return res.json().then(function(e){throw new Error(e.message);});
       p.style.cssText='opacity:0;transform:translateX(30px);transition:all .3s;';
       setTimeout(function(){p.remove();},300);
+      /* also clean up interactions for this post */
+      if(interCache&&interCache[id]){
+        delete interCache[id];
+        jbWrite(JB_BIN_INTER,interCache);
+      }
       syncOk('Post deleted from GitHub');
       setTimeout(function(){document.getElementById('syncBar').style.display='none';},3500);
       toast('Post deleted 🗑');
     });
-  }).catch(function(err){
-    syncErr('Delete failed: '+err.message);
-  });
+  }).catch(function(err){syncErr('Delete failed: '+err.message);});
 }
-
-/* ══════════════════════════════════════
-   CONTACT
-══════════════════════════════════════ */
-function sendMsg(){toast('Message sent! Emon will get back to you soon 📬');}
 
 /* ══════════════════════════════════════
    MOBILE NAV
