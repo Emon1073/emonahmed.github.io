@@ -751,7 +751,7 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
     <div class="about-right">
       <p class="sec-label">About Me</p>
       <h2 class="sec-title">Building the backbone of<br>data-driven decisions</h2>
-      <!-- ✏️ OWNER: Edit paragraphs below directly in this HTML file -->
+      <!--  OWNER: Edit paragraphs below directly in this HTML file -->
       <p class="about-p">I'm <strong>Emon Ahmed</strong>, a Computer Science student specialising in Data Engineering. I design systems that move, transform, and store data reliably at scale — from raw ingestion all the way to BI dashboards.</p>
       <p class="about-p">I've worked across the full data pipeline stack: batch ETL, real-time Kafka streams, cloud warehouses, and orchestration with Airflow. I care deeply about data quality, pipeline observability, and systems that are genuinely maintainable in production.</p>
       <p class="about-p"><strong>Currently exploring:</strong> Apache Spark optimisation, dbt best practices, Snowflake architecture, and distributed systems design patterns.</p>
@@ -782,7 +782,7 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
 </section>
 
 <!-- ════════ CV / EXPERIENCE ════════ -->
-<!-- ✏️ OWNER: Edit ALL CV content directly in this HTML section below -->
+<!--  OWNER: Edit ALL CV content directly in this HTML section below -->
 <section id="cv">
   <div class="reveal">
     <p class="sec-label">Resume</p>
@@ -795,7 +795,7 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
     <div class="cv-col">
       <h3>Experience</h3>
 
-      <!-- ✏️ Edit each cv-item to match your real experience -->
+      <!--  Edit each cv-item to match your real experience -->
       <div class="cv-item">
         <div class="cv-item-title">Data Engineering Intern</div>
         <div class="cv-item-org">Acme Analytics Ltd.</div>
@@ -1076,7 +1076,7 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
     <div class="contact-info">
       <p class="sec-label">Get In Touch</p>
       <h2 class="sec-title">Let's build something together</h2>
-      <!-- ✏️ OWNER: Edit contact links below -->
+      <!--  OWNER: Edit contact links below -->
       <p>Looking for internships, data engineering roles, or a collaborator on your next data project. Always happy to talk pipelines and systems design.</p>
       <div class="clinks">
         <a href="mailto:emonahmed.rup@gmail.com" class="clink"><div class="clink-icon">📧</div>emonahmed.rup@gmail.com</a>
@@ -1288,7 +1288,7 @@ function uploadPhoto(e){
   var d=document.getElementById('photoDisplay');
   d.src=URL.createObjectURL(f);d.style.display='block';
   document.getElementById('photoZone').style.border='none';
-  toast('Profile photo updated 📸');
+  toast('Profile photo updated ');
 }
 
 /* ══════════════════════════════════════
@@ -1793,15 +1793,15 @@ function sendMsg(){
     list.unshift(msg);
     return jbWrite(JB_BIN_MSGS,list);
   }).then(function(){
-    btn.textContent='Send Message 🚀';btn.disabled=false;
-    formStatus('✓ Message sent! Emon will get back to you soon 😊','ok');
+    btn.textContent='Send Message ';btn.disabled=false;
+    formStatus('✓ Message sent! Emon will get back to you soon ','ok');
     ['msgName','msgEmail','msgSubject','msgBody'].forEach(function(i){
       var el=document.getElementById(i);if(el)el.value='';
     });
     toast('Message delivered 📬');
     if(isOwner)loadInbox();
   }).catch(function(){
-    btn.textContent='Send Message 🚀';btn.disabled=false;
+    btn.textContent='Send Message ';btn.disabled=false;
     formStatus('Could not send. Email directly: emonahmed.rup@gmail.com','err');
   });
 }
@@ -1880,7 +1880,7 @@ function delPost(btn){
   if(!token){
     document.getElementById('tokenBar').style.display='block';
     document.getElementById('ghTokenInput').focus();
-    toast('Enter your GitHub token to delete 🔑');
+    toast('Enter your GitHub token to delete ');
     return;
   }
   var p=btn.closest('.post');
