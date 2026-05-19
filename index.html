@@ -448,6 +448,9 @@ body.viewer-mode .proj-img-area::after{content:'📊';font-size:2.5rem;position:
 .pmtag{font-size:.68rem;background:rgba(56,189,248,.1);color:var(--a1);border-radius:100px;padding:.18rem .6rem;font-weight:700;margin-left:.4rem;border:1px solid rgba(56,189,248,.2);}
 .post-time{font-size:.72rem;color:var(--muted2);}
 .post-content{font-size:.925rem;color:var(--muted);line-height:1.75;}
+.post-img{margin-top:.75rem;border-radius:12px;overflow:hidden;cursor:pointer;}
+.post-img img{width:100%;display:block;border-radius:12px;max-height:400px;object-fit:cover;transition:max-height .3s;}
+.post-img img.expanded{max-height:none;}
 .post-acts{display:flex;gap:.6rem;margin-top:.9rem;align-items:center;flex-wrap:wrap;}
 .pact{
   background:var(--bg2);border:1px solid var(--border);font-size:.78rem;color:var(--muted);
@@ -751,7 +754,7 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
     <div class="about-right">
       <p class="sec-label">About Me</p>
       <h2 class="sec-title">Building the backbone of<br>data-driven decisions</h2>
-      <!--  OWNER: Edit paragraphs below directly in this HTML file -->
+      <!-- ✏️ OWNER: Edit paragraphs below directly in this HTML file -->
       <p class="about-p">I'm <strong>Emon Ahmed</strong>, a Computer Science student specialising in Data Engineering. I design systems that move, transform, and store data reliably at scale — from raw ingestion all the way to BI dashboards.</p>
       <p class="about-p">I've worked across the full data pipeline stack: batch ETL, real-time Kafka streams, cloud warehouses, and orchestration with Airflow. I care deeply about data quality, pipeline observability, and systems that are genuinely maintainable in production.</p>
       <p class="about-p"><strong>Currently exploring:</strong> Apache Spark optimisation, dbt best practices, Snowflake architecture, and distributed systems design patterns.</p>
@@ -782,7 +785,7 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
 </section>
 
 <!-- ════════ CV / EXPERIENCE ════════ -->
-<!--  OWNER: Edit ALL CV content directly in this HTML section below -->
+<!-- ✏️ OWNER: Edit ALL CV content directly in this HTML section below -->
 <section id="cv">
   <div class="reveal">
     <p class="sec-label">Resume</p>
@@ -795,7 +798,7 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
     <div class="cv-col">
       <h3>Experience</h3>
 
-      <!--  Edit each cv-item to match your real experience -->
+      <!-- ✏️ Edit each cv-item to match your real experience -->
       <div class="cv-item">
         <div class="cv-item-title">Data Engineering Intern</div>
         <div class="cv-item-org">Acme Analytics Ltd.</div>
@@ -1038,6 +1041,11 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
       <strong>What's on your mind, Emon?</strong>
     </div>
     <textarea id="postTxt" placeholder="Share a tech insight, project update, or feeling..."></textarea>
+    <!-- Photo preview -->
+    <div id="postImgPreview" style="display:none;margin-top:.75rem;position:relative;border-radius:12px;overflow:hidden;max-height:280px;">
+      <img id="postImgEl" src="" alt="Post image" style="width:100%;object-fit:cover;display:block;border-radius:12px;"/>
+      <button onclick="removePostImg()" style="position:absolute;top:.5rem;right:.5rem;background:rgba(0,0,0,.6);color:#fff;border:none;border-radius:50%;width:28px;height:28px;font-size:.85rem;cursor:none;font-weight:700;">✕</button>
+    </div>
     <div class="compose-foot">
       <div class="mood-row">
         <button class="mood-btn" onclick="pickMood(this,'😄 Happy')">😄 Happy</button>
@@ -1047,7 +1055,12 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
         <button class="mood-btn" onclick="pickMood(this,'🎉 Win')">🎉 Win</button>
         <button class="mood-btn" onclick="pickMood(this,'☕ Coffee')">☕ Coffee</button>
       </div>
-      <button class="post-btn" onclick="submitPost()">Post →</button>
+      <div style="display:flex;gap:.5rem;align-items:center;">
+        <!-- Photo attach button -->
+        <button onclick="document.getElementById('postImgInput').click()" title="Add photo" style="background:var(--bg2);border:1px solid var(--border);border-radius:100px;padding:.45rem .9rem;font-size:.8rem;font-weight:700;cursor:none;color:var(--muted);transition:all .2s;">📷 Photo</button>
+        <input type="file" id="postImgInput" accept="image/*" style="display:none" onchange="attachPostImg(event)"/>
+        <button class="post-btn" onclick="submitPost()">Post →</button>
+      </div>
     </div>
     <!-- GitHub Token input — owner only, shown once -->
     <div id="tokenBar" style="display:none;margin-top:1rem;background:rgba(251,191,36,.06);border:1px solid rgba(251,191,36,.2);border-radius:12px;padding:1rem 1.25rem;">
@@ -1076,7 +1089,7 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
     <div class="contact-info">
       <p class="sec-label">Get In Touch</p>
       <h2 class="sec-title">Let's build something together</h2>
-      <!--  OWNER: Edit contact links below -->
+      <!-- ✏️ OWNER: Edit contact links below -->
       <p>Looking for internships, data engineering roles, or a collaborator on your next data project. Always happy to talk pipelines and systems design.</p>
       <div class="clinks">
         <a href="mailto:emonahmed.rup@gmail.com" class="clink"><div class="clink-icon">📧</div>emonahmed.rup@gmail.com</a>
@@ -1097,7 +1110,7 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
       <div class="fg"><label>Email</label><input id="msgEmail" type="email" placeholder="your@email.com"/></div>
       <div class="fg"><label>Subject</label><input id="msgSubject" type="text" placeholder="Internship, project, collab..."/></div>
       <div class="fg"><label>Message</label><textarea id="msgBody" placeholder="Tell me what you're building..." style="min-height:100px;"></textarea></div>
-      <button class="btn-glow" id="sendMsgBtn" style="width:100%;border-radius:10px;" onclick="sendMsg()">Send Message </button>
+      <button class="btn-glow" id="sendMsgBtn" style="width:100%;border-radius:10px;" onclick="sendMsg()">Send Message 🚀</button>
     </div>
   </div>
   <!-- Owner inbox panel -->
@@ -1113,7 +1126,7 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
 <!-- FOOTER -->
 <footer>
   <div class="flogo">Emon<span>.</span></div>
-  <p>© 2026 Emon Ahmed · Data Engineer in the Making</p>
+  <p>© 2025 Emon Ahmed · Data Engineer in the Making</p>
   <p>CS Student · Pipeline Builder · Open Source Contributor</p>
 </footer>
 
@@ -1281,14 +1294,55 @@ function lockOwner(){
 function ownerAction(fn){if(isOwner)fn();}
 
 /* ══════════════════════════════════════
-   PHOTO UPLOAD (owner only)
+   PHOTO UPLOAD (owner only) — Cloudinary
 ══════════════════════════════════════ */
+var GH_SETTINGS_FILE='settings.json';
+var GH_SETTINGS_API='https://api.github.com/repos/'+GH_USER+'/'+GH_REPO+'/contents/'+GH_SETTINGS_FILE;
+var GH_SETTINGS_RAW='https://raw.githubusercontent.com/'+GH_USER+'/'+GH_REPO+'/'+GH_BRANCH+'/'+GH_SETTINGS_FILE;
+var siteSettings={};
+
+function loadSettings(){
+  fetch(GH_SETTINGS_RAW+'?nocache='+Date.now())
+    .then(function(r){return r.status===404?{}:r.json();})
+    .then(function(s){
+      siteSettings=s||{};
+      if(s.profilePhoto){
+        var d=document.getElementById('photoDisplay');
+        if(d){d.src=s.profilePhoto;d.style.display='block';
+          document.getElementById('photoZone').style.border='none';}
+      }
+      if(s.gallery&&s.gallery.length){
+        s.gallery.forEach(function(url){addGalItem(url);});
+      }
+    }).catch(function(){});
+}
+loadSettings();
+
+function saveSettings(token){
+  if(!token)return;
+  var content=btoa(unescape(encodeURIComponent(JSON.stringify(siteSettings,null,2))));
+  fetch(GH_SETTINGS_API,{headers:{'Authorization':'token '+token,'Accept':'application/vnd.github.v3+json'}})
+    .then(function(r){return r.status===404?null:r.json();})
+    .then(function(d){
+      var body={message:'Update site settings',content:content,branch:GH_BRANCH};
+      if(d&&d.sha)body.sha=d.sha;
+      return fetch(GH_SETTINGS_API,{method:'PUT',
+        headers:{'Authorization':'token '+token,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+        body:JSON.stringify(body)});
+    }).catch(function(){});
+}
+
 function uploadPhoto(e){
+  if(!isOwner)return;
   var f=e.target.files[0];if(!f)return;
-  var d=document.getElementById('photoDisplay');
-  d.src=URL.createObjectURL(f);d.style.display='block';
-  document.getElementById('photoZone').style.border='none';
-  toast('Profile photo updated ');
+  uploadToCloudinary(f,function(url){
+    var d=document.getElementById('photoDisplay');
+    d.src=url;d.style.display='block';
+    document.getElementById('photoZone').style.border='none';
+    toast('Profile photo saved permanently 📸');
+    var token=getToken();
+    if(token){siteSettings.profilePhoto=url;saveSettings(token);}
+  },function(){toast('Upload failed — check connection');});
 }
 
 /* ══════════════════════════════════════
@@ -1296,10 +1350,7 @@ function uploadPhoto(e){
 ══════════════════════════════════════ */
 function uploadDocs(e){
   if(!isOwner)return;
-  Array.from(e.target.files).forEach(function(f){
-    docFiles.push(f);
-    renderDoc(f,docFiles.length-1);
-  });
+  Array.from(e.target.files).forEach(function(f){docFiles.push(f);renderDoc(f,docFiles.length-1);});
   document.getElementById('docsEmpty').style.display='none';
   toast(e.target.files.length+' document(s) added 📄');
 }
@@ -1307,8 +1358,7 @@ function renderDoc(f,i){
   var grid=document.getElementById('docGrid');
   var s=f.size>1048576?(f.size/1048576).toFixed(1)+' MB':Math.round(f.size/1024)+' KB';
   var icon=f.type.includes('pdf')?'📄':f.type.includes('image')?'🖼':'📝';
-  var card=document.createElement('div');card.className='doc-card';
-  card.dataset.idx=i;
+  var card=document.createElement('div');card.className='doc-card';card.dataset.idx=i;
   card.innerHTML='<div class="doc-icon">'+icon+'</div>'
     +'<div><div class="doc-name">'+f.name+'</div><div class="doc-meta">'+s+'</div></div>'
     +'<div class="doc-actions">'
@@ -1319,9 +1369,7 @@ function renderDoc(f,i){
 }
 function viewDoc(i){if(docFiles[i])window.open(URL.createObjectURL(docFiles[i]),'_blank');}
 function delDoc(btn,i){
-  if(!isOwner)return;
-  btn.closest('.doc-card').remove();
-  docFiles[i]=null;
+  if(!isOwner)return;btn.closest('.doc-card').remove();docFiles[i]=null;
   if(!docFiles.filter(Boolean).length)document.getElementById('docsEmpty').style.display='block';
   toast('Document removed');
 }
@@ -1329,24 +1377,24 @@ var dropZone=document.getElementById('docsUploadZone');
 dropZone.addEventListener('dragover',function(e){e.preventDefault();this.style.borderColor='var(--a1)';});
 dropZone.addEventListener('dragleave',function(){this.style.borderColor='';});
 dropZone.addEventListener('drop',function(e){
-  e.preventDefault();this.style.borderColor='';
-  if(!isOwner)return;
+  e.preventDefault();this.style.borderColor='';if(!isOwner)return;
   Array.from(e.dataTransfer.files).forEach(function(f){docFiles.push(f);renderDoc(f,docFiles.length-1);});
-  document.getElementById('docsEmpty').style.display='none';
-  toast('Document(s) uploaded 📄');
+  document.getElementById('docsEmpty').style.display='none';toast('Document(s) uploaded 📄');
 });
 
 /* ══════════════════════════════════════
-   PROJECT IMAGE UPLOAD
+   PROJECT IMAGE — Cloudinary
 ══════════════════════════════════════ */
 function triggerImg(id){document.getElementById(id+'-file').click();}
 function uploadImg(e,id){
   if(!isOwner)return;
   var f=e.target.files[0];if(!f)return;
-  var img=document.getElementById(id+'-img');
-  img.src=URL.createObjectURL(f);img.style.display='block';
-  var btn=document.getElementById(id+'-up');if(btn)btn.style.display='none';
-  toast('Screenshot added 🖼');
+  uploadToCloudinary(f,function(url){
+    var img=document.getElementById(id+'-img');
+    img.src=url;img.style.display='block';
+    var btn=document.getElementById(id+'-up');if(btn)btn.style.display='none';
+    toast('Screenshot saved permanently 🖼');
+  },function(){toast('Image upload failed');});
 }
 
 /* ══════════════════════════════════════
@@ -1363,38 +1411,52 @@ function addProj(){
   var desc=document.getElementById('mDesc').value.trim();
   if(!title||!desc){toast('Fill title & description!');return;}
   var pid='p'+Date.now();
-  var grid=document.getElementById('projGrid');
-  var addBtn=document.getElementById('addProjBtn');
+  var grid=document.getElementById('projGrid');var addBtn=document.getElementById('addProjBtn');
   var tagName=document.getElementById('mTag').options[document.getElementById('mTag').selectedIndex].text||'Project';
   var links=(live?'<a href="'+live+'" target="_blank">Live</a>':'')+(git?'<a href="'+git+'" target="_blank">GitHub</a>':'');
   var card=document.createElement('div');card.className='proj-card';
   card.innerHTML='<div class="proj-img-area"><div class="proj-img-btn" onclick="ownerAction(function(){triggerImg(\''+pid+'\')})" id="'+pid+'-up"><div class="ic">📊</div><span>Add screenshot</span></div><img src="" alt="" id="'+pid+'-img"/><input type="file" id="'+pid+'-file" accept="image/*" style="display:none" onchange="uploadImg(event,\''+pid+'\')" /></div><div class="proj-body"><span class="ptag '+tagClass+'">'+tagName+'</span><div class="proj-title">'+title+'</div><div class="proj-desc">'+desc+'</div><div class="proj-links">'+links+'</div></div>';
   grid.insertBefore(card,addBtn);
   ['mTitle','mDesc','mLive','mGit'].forEach(function(id){document.getElementById(id).value='';});
-  document.getElementById('mTag').selectedIndex=0;
-  closeAddProj();toast('Project added 🚀');
+  document.getElementById('mTag').selectedIndex=0;closeAddProj();toast('Project added 🚀');
 }
 
 /* ══════════════════════════════════════
-   GALLERY
+   GALLERY — Cloudinary + settings.json
 ══════════════════════════════════════ */
+function addGalItem(url){
+  var grid=document.getElementById('masonry');
+  var wrap=document.createElement('div');wrap.className='gal-item';
+  var img=document.createElement('img');img.src=url;img.alt='Gallery';img.style.width='100%';img.style.display='block';
+  var ov=document.createElement('div');ov.className='gal-overlay';
+  var btn=document.createElement('button');
+  btn.className='gal-del-btn'+(isOwner?' owner-visible':'');
+  btn.textContent='🗑 Remove';btn.dataset.url=url;
+  btn.setAttribute('onclick','delGalItem(this)');
+  ov.appendChild(btn);wrap.appendChild(img);wrap.appendChild(ov);grid.appendChild(wrap);
+}
 function uploadGal(e){
   if(!isOwner)return;
   Array.from(e.target.files).forEach(function(f){
-    var wrap=document.createElement('div');wrap.className='gal-item';
-    var img=document.createElement('img');img.src=URL.createObjectURL(f);img.alt='Gallery';img.style.width='100%';img.style.display='block';
-    var ov=document.createElement('div');ov.className='gal-overlay';
-    var btn=document.createElement('button');btn.className='gal-del-btn owner-visible';btn.textContent='🗑 Remove';btn.setAttribute('onclick','delGalItem(this)');
-    ov.appendChild(btn);wrap.appendChild(img);wrap.appendChild(ov);
-    document.getElementById('masonry').appendChild(wrap);
+    uploadToCloudinary(f,function(url){
+      addGalItem(url);
+      if(!siteSettings.gallery)siteSettings.gallery=[];
+      siteSettings.gallery.push(url);
+      var token=getToken();if(token)saveSettings(token);
+      toast('Photo saved permanently 📸');
+    },function(){toast('Gallery upload failed');});
   });
-  toast(e.target.files.length+' photo(s) added 📸');
 }
 function delGalItem(btn){
   if(!isOwner)return;
+  var url=btn.dataset.url;
   var item=btn.closest('.gal-item');
   item.style.cssText='opacity:0;transform:scale(.9);transition:all .3s;';
   setTimeout(function(){item.remove();},300);
+  if(url&&siteSettings.gallery){
+    siteSettings.gallery=siteSettings.gallery.filter(function(u){return u!==url;});
+    var token=getToken();if(token)saveSettings(token);
+  }
   toast('Photo removed');
 }
 
@@ -1409,6 +1471,29 @@ var GH_FILE  = 'posts.json';
 var GH_BRANCH= 'main';
 var GH_API   = 'https://api.github.com/repos/'+GH_USER+'/'+GH_REPO+'/contents/'+GH_FILE;
 var GH_RAW   = 'https://raw.githubusercontent.com/'+GH_USER+'/'+GH_REPO+'/'+GH_BRANCH+'/'+GH_FILE;
+
+/* ══════════════════════════════════════
+   CLOUDINARY — permanent image hosting
+   All uploads go here → permanent URL
+══════════════════════════════════════ */
+var CL_CLOUD  = 'dwepn19zh';
+var CL_PRESET = 'portfolio';
+var CL_URL    = 'https://api.cloudinary.com/v1_1/'+CL_CLOUD+'/image/upload';
+
+function uploadToCloudinary(file,onSuccess,onError){
+  var fd=new FormData();
+  fd.append('file',file);
+  fd.append('upload_preset',CL_PRESET);
+  fd.append('folder','emon-portfolio');
+  toast('Uploading image... ⏳');
+  fetch(CL_URL,{method:'POST',body:fd})
+    .then(function(r){return r.json();})
+    .then(function(d){
+      if(d.secure_url){onSuccess(d.secure_url);}
+      else{onError&&onError('Upload failed');}
+    })
+    .catch(function(e){onError&&onError(e.message);});
+}
 
 /* Token stored in sessionStorage (cleared when browser tab closes) */
 function getToken(){ return sessionStorage.getItem('gh_token')||''; }
@@ -1441,20 +1526,33 @@ function syncInfo(msg){syncStatus('⟳ '+msg,'56,189,248');}
 /* ── Build post card HTML ── */
 function buildPostHTML(d){
   var mTag=d.mood?'<span class="pmtag">'+d.mood+'</span>':'';
+  var likes=d.likes||0;
+  var comments=d.comments||[];
+  var commentsHTML=comments.map(function(c){
+    return '<div class="comment-item">'
+      +'<div class="comment-avatar">'+escHtml(c.name.charAt(0).toUpperCase())+'</div>'
+      +'<div class="comment-bubble">'
+      +'<div class="comment-name">'+escHtml(c.name)+'</div>'
+      +'<div class="comment-text">'+escHtml(c.text)+'</div>'
+      +'<div class="comment-time">'+c.time+'</div>'
+      +'</div></div>';
+  }).join('');
+  var imgHTML=d.image?'<div class="post-img"><img src="'+d.image+'" alt="Post image" onclick="this.classList.toggle(\'expanded\')"/></div>':'';
   return '<div class="post" data-id="'+d.id+'">'
     +'<div class="post-head"><div class="avatar">EA</div>'
     +'<div class="post-meta">'
     +'<div class="post-author">Emon Ahmed '+mTag+'</div>'
     +'<div class="post-time">'+d.time+'</div>'
     +'</div></div>'
-    +'<div class="post-content">'+d.content+'</div>'
+    +(d.content?'<div class="post-content">'+d.content+'</div>':'')
+    +imgHTML
     +'<div class="post-acts">'
-    +'<button class="pact like-btn" onclick="likePost(this)">❤️ <span class="like-count">0</span><span class="like-label"> Likes</span></button>'
-    +'<button class="pact comment-btn" onclick="toggleComments(this)">💬 <span class="comment-count">0</span><span class="comment-label"> Comments</span></button>'
+    +'<button class="pact like-btn" onclick="likePost(this)">❤️ <span class="like-count">'+likes+'</span><span class="like-label"> Like'+(likes===1?'':'s')+'</span></button>'
+    +'<button class="pact comment-btn" onclick="toggleComments(this)">💬 <span class="comment-count">'+comments.length+'</span><span class="comment-label"> Comment'+(comments.length===1?'':'s')+'</span></button>'
     +'<button class="pdel" onclick="delPost(this)">Delete</button>'
     +'</div>'
     +'<div class="comments-wrap">'
-    +'<div class="comments-list"></div>'
+    +'<div class="comments-list">'+commentsHTML+'</div>'
     +'<div class="comment-input-row">'
     +'<input class="comment-name-input" placeholder="Your name"/>'
     +'<input class="comment-input" placeholder="Write a comment..." onkeydown="if(event.key===\'Enter\')submitComment(this)"/>'
@@ -1468,19 +1566,18 @@ function renderPosts(posts){
   var feed=document.getElementById('postsFeed');
   feed.innerHTML='';
   if(!posts||!posts.length){
-    feed.innerHTML='<div style="text-align:center;padding:3rem 0;color:var(--muted2);font-size:.875rem;">No posts yet.</div>';
+    feed.innerHTML='<div style="text-align:center;padding:3rem 0;color:var(--muted2);font-size:.875rem;">No posts yet. Be the first to post!</div>';
     return;
   }
   posts.forEach(function(d){
     var tmp=document.createElement('template');
     tmp.innerHTML=buildPostHTML(d);
     var el=tmp.content.firstChild;
-    if(isOwner)el.querySelector('.pdel').classList.add('owner-visible');
+    /* show delete btn only if owner */
+    if(isOwner) el.querySelector('.pdel').classList.add('owner-visible');
     feed.appendChild(el);
   });
   restoreLikes();
-  /* Load likes & comments from JSONBin and apply permanently */
-  loadInteractions().then(function(){applyInteractions();});
 }
 
 /* ── Load posts.json from GitHub (public raw URL, no auth needed) ── */
@@ -1545,6 +1642,23 @@ function fetchCurrentPosts(token){
     .catch(function(){return[];});
 }
 
+/* ── Post image attach/remove ── */
+var pendingPostImg = null; /* File object waiting to upload */
+function attachPostImg(e){
+  var f=e.target.files[0];if(!f)return;
+  pendingPostImg=f;
+  var preview=document.getElementById('postImgPreview');
+  var img=document.getElementById('postImgEl');
+  img.src=URL.createObjectURL(f);
+  preview.style.display='block';
+  document.getElementById('postImgInput').value='';
+}
+function removePostImg(){
+  pendingPostImg=null;
+  document.getElementById('postImgPreview').style.display='none';
+  document.getElementById('postImgEl').src='';
+}
+
 /* ── Mood picker ── */
 function pickMood(btn,m){
   document.querySelectorAll('.mood-btn').forEach(function(b){b.classList.remove('active');});
@@ -1555,130 +1669,66 @@ function pickMood(btn,m){
 function submitPost(){
   if(!isOwner)return;
   var txt=document.getElementById('postTxt').value.trim();
-  if(!txt){toast('Write something first!');return;}
+  if(!txt&&!pendingPostImg){toast('Write something or add a photo!');return;}
   var token=getToken();
   if(!token){
-    /* show token input bar */
     window._pendingPost=true;
     document.getElementById('tokenBar').style.display='block';
     document.getElementById('ghTokenInput').focus();
     toast('Enter your GitHub token first 🔑');
     return;
   }
-  var now=new Date().toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  var data={id:'post_'+Date.now(),mood:mood,time:now,content:txt.replace(/\n/g,'<br>')};
 
-  /* Disable post button while saving */
   var postBtn=document.querySelector('.post-btn');
-  postBtn.textContent='Saving...';postBtn.disabled=true;
-  syncInfo('Saving post to GitHub...');
+  postBtn.textContent='Posting...';postBtn.disabled=true;
+  syncInfo('Publishing post...');
 
-  fetchCurrentPosts(token).then(function(posts){
-    posts.unshift(data); /* newest first */
-    return commitPosts(posts,token,'Add post: '+data.time);
-  }).then(function(res){
-    if(!res.ok){
-      return res.json().then(function(e){
-        throw new Error(e.message||'GitHub API error '+res.status);
+  function doPost(imageUrl){
+    var now=new Date().toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    var data={id:'post_'+Date.now(),mood:mood,time:now,content:txt,likes:0,comments:[]};
+    if(imageUrl)data.image=imageUrl;
+
+    fetchCurrentPosts(token).then(function(posts){
+      posts.unshift(data);
+      return commitPosts(posts,token,'Add post: '+data.time);
+    }).then(function(res){
+      if(!res.ok)return res.json().then(function(e){throw new Error(e.message||'GitHub error');});
+      return fetchCurrentPosts(token).then(function(latest){
+        renderPosts(latest);
+        document.querySelectorAll('.pdel').forEach(function(e){e.classList.add('owner-visible');});
+        syncOk('Post published! Visible to everyone ✓');
+        setTimeout(function(){document.getElementById('syncBar').style.display='none';},4000);
+        toast('Post published 🚀');
       });
-    }
-    /* success — re-render */
-    return fetchCurrentPosts(token).then(function(latest){
-      renderPosts(latest);
-      /* apply owner state to new delete btns */
-      document.querySelectorAll('.pdel').forEach(function(e){e.classList.add('owner-visible');});
-      syncOk('Post saved to GitHub ✓ — visible to all visitors now!');
-      setTimeout(function(){document.getElementById('syncBar').style.display='none';},4000);
-      toast('Post published to GitHub 🚀');
+    }).catch(function(err){
+      syncErr('Failed: '+err.message);
+      toast('Post failed — see status bar');
+    }).finally(function(){
+      postBtn.textContent='Post →';postBtn.disabled=false;
+      document.getElementById('postTxt').value='';
+      removePostImg();
+      document.querySelectorAll('.mood-btn').forEach(function(b){b.classList.remove('active');});
+      mood='';window._pendingPost=false;
     });
-  }).catch(function(err){
-    syncErr('Failed: '+err.message+' — check your token has repo scope');
-    toast('Save failed — see status bar');
-  }).finally(function(){
-    postBtn.textContent='Post →';postBtn.disabled=false;
-    document.getElementById('postTxt').value='';
-    document.querySelectorAll('.mood-btn').forEach(function(b){b.classList.remove('active');});
-    mood='';
-    window._pendingPost=false;
-  });
+  }
+
+  if(pendingPostImg){
+    postBtn.textContent='Uploading photo...';
+    uploadToCloudinary(pendingPostImg,function(url){
+      doPost(url);
+    },function(err){
+      syncErr('Image upload failed: '+err);
+      postBtn.textContent='Post →';postBtn.disabled=false;
+    });
+  } else {
+    doPost(null);
+  }
 }
 
 /* ── Escape HTML helper ── */
 function escHtml(s){return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
-/* ══════════════════════════════════════
-   JSONBIN — permanent storage for
-   likes, comments & contact messages
-   Credentials: Emon Ahmed / jsonbin.io
-══════════════════════════════════════ */
-var JB_KEY       = '$2a$10$MHhu9c4Qin3Nyr9jt9V3d.CkPZlVEues8aZ5RXlruqaTJv5UsTWKi';
-var JB_BIN_INTER = '6a0a5526adc21f119ab61465'; /* likes & comments */
-var JB_BIN_MSGS  = '6a0a556fc0954111d83b4b2a'; /* contact messages */
-var JB_BASE      = 'https://api.jsonbin.io/v3/b/';
-var interCache   = null;  /* {postId:{likes:N,comments:[...]}} */
-var msgsCache    = null;  /* [{id,name,email,...}]             */
-
-function jbRead(binId){
-  return fetch(JB_BASE+binId+'/latest',{
-    headers:{'X-Master-Key':JB_KEY,'X-Bin-Meta':'false'}
-  }).then(function(r){return r.json();})
-    .then(function(r){return r&&r.record!==undefined?r.record:r;})
-    .catch(function(){return null;});
-}
-function jbWrite(binId,data){
-  return fetch(JB_BASE+binId,{
-    method:'PUT',
-    headers:{'Content-Type':'application/json','X-Master-Key':JB_KEY},
-    body:JSON.stringify(data)
-  }).then(function(r){return r.json();}).catch(function(){});
-}
-
-/* ── Load interactions from JSONBin ── */
-function loadInteractions(){
-  return jbRead(JB_BIN_INTER).then(function(d){
-    interCache=(d&&typeof d==='object'&&!Array.isArray(d))?d:{};
-    return interCache;
-  }).catch(function(){interCache={};return{};});
-}
-
-/* ── Overlay saved likes & comments onto rendered posts ── */
-function applyInteractions(){
-  if(!interCache)return;
-  document.querySelectorAll('.post').forEach(function(post){
-    var id=post.dataset.id;
-    if(!id||!interCache[id])return;
-    var data=interCache[id];
-    /* likes */
-    var likes=data.likes||0;
-    var likeBtn=post.querySelector('.like-btn');
-    if(likeBtn){
-      likeBtn.querySelector('.like-count').textContent=likes;
-      likeBtn.querySelector('.like-label').textContent=' Like'+(likes===1?'':'s');
-      if(localStorage.getItem('liked_'+id))likeBtn.classList.add('liked');
-    }
-    /* comments */
-    var comments=data.comments||[];
-    var commentBtn=post.querySelector('.comment-btn');
-    if(commentBtn){
-      commentBtn.querySelector('.comment-count').textContent=comments.length;
-      commentBtn.querySelector('.comment-label').textContent=' Comment'+(comments.length===1?'':'s');
-    }
-    var list=post.querySelector('.comments-list');
-    if(list){
-      list.innerHTML=comments.map(function(c){
-        return '<div class="comment-item">'
-          +'<div class="comment-avatar">'+escHtml(c.name.charAt(0).toUpperCase())+'</div>'
-          +'<div class="comment-bubble">'
-          +'<div class="comment-name">'+escHtml(c.name)+'</div>'
-          +'<div class="comment-text">'+escHtml(c.text)+'</div>'
-          +'<div class="comment-time">'+c.time+'</div>'
-          +'</div></div>';
-      }).join('');
-    }
-  });
-}
-
-/* ── Restore liked button state from localStorage ── */
+/* Restore liked state from localStorage on load */
 function restoreLikes(){
   document.querySelectorAll('.post').forEach(function(post){
     var id=post.dataset.id;
@@ -1689,55 +1739,30 @@ function restoreLikes(){
   });
 }
 
-/* ── Like / Unlike — saves permanently to JSONBin ── */
-function likePost(btn){
-  var post=btn.closest('.post');
-  var id=post.dataset.id;
-  var alreadyLiked=!!localStorage.getItem('liked_'+id);
-  var countEl=btn.querySelector('.like-count');
-  var labelEl=btn.querySelector('.like-label');
-  var count=parseInt(countEl.textContent)||0;
-  if(alreadyLiked){
-    count=Math.max(0,count-1);
-    localStorage.removeItem('liked_'+id);
-    btn.classList.remove('liked');
-  } else {
-    count++;
-    localStorage.setItem('liked_'+id,'1');
-    btn.classList.add('liked');
-  }
-  countEl.textContent=count;
-  if(labelEl)labelEl.textContent=' Like'+(count===1?'':'s');
-  /* Save to JSONBin — all visitors see the updated count */
-  if(!interCache)interCache={};
-  if(!interCache[id])interCache[id]={likes:0,comments:[]};
-  interCache[id].likes=count;
-  jbWrite(JB_BIN_INTER,interCache);
-}
-
-/* ── Toggle comments open/close ── */
+/* ── Toggle comments section ── */
 function toggleComments(btn){
   var wrap=btn.closest('.post').querySelector('.comments-wrap');
   var open=wrap.classList.toggle('open');
   btn.classList.toggle('commented',open);
-  if(open)wrap.querySelector('.comment-input').focus();
+  if(open) wrap.querySelector('.comment-input').focus();
 }
 
-/* ── Submit comment — saves permanently to JSONBin ── */
+/* ── Submit comment ── */
 function submitComment(input){
   var text=input.value.trim();
-  var nameInput=input.previousElementSibling;
-  var name=(nameInput&&nameInput.value.trim())||'Anonymous';
-  if(!text){input.focus();toast('Write your comment first!');return;}
+  var nameInput=input.nextElementSibling;
+  var name=nameInput.value.trim()||'Anonymous';
+  if(!text){input.focus();return;}
   var post=input.closest('.post');
   var id=post.dataset.id;
-  var now=new Date().toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  var now=new Date().toLocaleString('en-US',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});
   var comment={name:name,text:text,time:now};
+
   /* Render immediately */
   var list=post.querySelector('.comments-list');
   var el=document.createElement('div');
   el.className='comment-item';
-  el.innerHTML='<div class="comment-avatar">'+escHtml(name.charAt(0).toUpperCase())+'</div>'
+  el.innerHTML='<div class="comment-avatar">'+name.charAt(0).toUpperCase()+'</div>'
     +'<div class="comment-bubble">'
     +'<div class="comment-name">'+escHtml(name)+'</div>'
     +'<div class="comment-text">'+escHtml(text)+'</div>'
@@ -1745,33 +1770,46 @@ function submitComment(input){
     +'</div>';
   list.appendChild(el);
   input.value='';
-  /* Update count badge */
+
+  /* Update comment count badge */
   var countEl=post.querySelector('.comment-count');
-  var labelEl=post.querySelector('.comment-label');
   var count=(parseInt(countEl.textContent)||0)+1;
   countEl.textContent=count;
-  if(labelEl)labelEl.textContent=' Comment'+(count===1?'':'s');
-  /* Save to JSONBin — permanent for all visitors */
-  if(!interCache)interCache={};
-  if(!interCache[id])interCache[id]={likes:0,comments:[]};
-  interCache[id].comments.push(comment);
-  jbWrite(JB_BIN_INTER,interCache).then(function(){
-    toast('Comment saved permanently 💬');
-  }).catch(function(){
-    toast('Comment shown — check internet connection');
-  });
+  post.querySelector('.comment-btn').lastChild.textContent=' Comment'+(count===1?'':'s');
+
+  /* Save to GitHub (everyone's comments, stored in post data) */
+  var token=getToken();
+  if(token){
+    fetchCurrentPosts(token).then(function(posts){
+      var updated=posts.map(function(p){
+        if(p.id===id){
+          var comments=p.comments||[];
+          comments.push(comment);
+          return Object.assign({},p,{comments:comments});
+        }
+        return p;
+      });
+      commitPosts(updated,token,'Add comment on post '+id);
+    }).catch(function(){/* silent fail - comment still shows */});
+  }
+  toast('Comment posted 💬');
 }
 
 /* ══════════════════════════════════════
-   CONTACT FORM — saves to JSONBin
+   CONTACT FORM — saves to messages.json
 ══════════════════════════════════════ */
+var GH_MSG_FILE='messages.json';
+var GH_MSG_API='https://api.github.com/repos/'+GH_USER+'/'+GH_REPO+'/contents/'+GH_MSG_FILE;
+var GH_MSG_RAW='https://raw.githubusercontent.com/'+GH_USER+'/'+GH_REPO+'/'+GH_BRANCH+'/'+GH_MSG_FILE;
+
 function formStatus(msg,type){
   var el=document.getElementById('formStatus');
-  if(!el)return;
   var colors={ok:'52,211,153',err:'220,38,38',info:'2,132,199'};
   var c=colors[type]||colors.info;
-  el.style.cssText='display:block;border-radius:10px;padding:.6rem 1rem;font-size:.82rem;font-weight:600;'
-    +'background:rgba('+c+',.09);border:1px solid rgba('+c+',.28);color:rgb('+c+');margin-bottom:1rem;';
+  el.style.display='block';
+  el.style.background='rgba('+c+',.08)';
+  el.style.border='1px solid rgba('+c+',.25)';
+  el.style.color='rgb('+c+')';
   el.textContent=msg;
 }
 
@@ -1782,54 +1820,94 @@ function sendMsg(){
   var body=document.getElementById('msgBody').value.trim();
   if(!name||!email||!body){formStatus('Please fill in name, email and message.','err');return;}
   if(!/\S+@\S+\.\S+/.test(email)){formStatus('Please enter a valid email address.','err');return;}
+
   var btn=document.getElementById('sendMsgBtn');
   btn.textContent='Sending...';btn.disabled=true;
-  formStatus('Sending...','info');
+  formStatus('Sending your message...','info');
+
   var now=new Date().toLocaleString('en-US',{month:'long',day:'numeric',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  var msg={id:'msg_'+Date.now(),name:name,email:email,subject:subject||'(no subject)',body:body,time:now};
-  /* Read current msgs → prepend new → write back */
-  jbRead(JB_BIN_MSGS).then(function(d){
-    var list=Array.isArray(d)?d:[];
-    list.unshift(msg);
-    return jbWrite(JB_BIN_MSGS,list);
-  }).then(function(){
-    btn.textContent='Send Message ';btn.disabled=false;
-    formStatus('✓ Message sent! Emon will get back to you soon ','ok');
-    ['msgName','msgEmail','msgSubject','msgBody'].forEach(function(i){
-      var el=document.getElementById(i);if(el)el.value='';
+  var msg={id:'msg_'+Date.now(),name:name,email:email,subject:subject||'(no subject)',body:body,time:now,read:false};
+
+  /* Fetch existing messages.json, append, commit */
+  fetch(GH_MSG_RAW+'?nocache='+Date.now())
+    .then(function(r){return r.status===404?[]:r.json();})
+    .catch(function(){return[];})
+    .then(function(msgs){
+      msgs.unshift(msg);
+      var content=btoa(unescape(encodeURIComponent(JSON.stringify(msgs,null,2))));
+      /* get SHA */
+      return fetch(GH_MSG_API,{headers:{'Authorization':'token anonymous','Accept':'application/vnd.github.v3+json'}})
+        .then(function(r){return r.status===404?null:r.json();})
+        .then(function(d){
+          var body2={message:'New message from '+name,content:content,branch:GH_BRANCH};
+          if(d&&d.sha)body2.sha=d.sha;
+          /* Use a public write token if set, else use owner token if logged in, else store locally */
+          var tok=getToken();
+          if(!tok){
+            /* No token available — store in localStorage as fallback */
+            var stored=JSON.parse(localStorage.getItem('emon_msgs')||'[]');
+            stored.unshift(msg);
+            localStorage.setItem('emon_msgs',JSON.stringify(stored));
+            return {ok:true,_local:true};
+          }
+          return fetch(GH_MSG_API,{
+            method:'PUT',
+            headers:{'Authorization':'token '+tok,'Content-Type':'application/json','Accept':'application/vnd.github.v3+json'},
+            body:JSON.stringify(body2)
+          });
+        });
+    })
+    .then(function(res){
+      btn.textContent='Send Message 🚀';btn.disabled=false;
+      if(res&&res.ok){
+        formStatus('✓ Message sent! Emon will get back to you soon.','ok');
+        ['msgName','msgEmail','msgSubject','msgBody'].forEach(function(id){document.getElementById(id).value='';});
+        toast('Message delivered 📬');
+        /* refresh inbox if owner open */
+        if(isOwner)loadInbox();
+      } else {
+        formStatus('Something went wrong. Please email directly.','err');
+      }
+    })
+    .catch(function(){
+      btn.textContent='Send Message 🚀';btn.disabled=false;
+      /* fallback to localStorage */
+      var stored=JSON.parse(localStorage.getItem('emon_msgs')||'[]');
+      stored.unshift(msg);
+      localStorage.setItem('emon_msgs',JSON.stringify(stored));
+      formStatus('✓ Message sent!','ok');
+      ['msgName','msgEmail','msgSubject','msgBody'].forEach(function(id){document.getElementById(id).value='';});
+      toast('Message delivered 📬');
     });
-    toast('Message delivered 📬');
-    if(isOwner)loadInbox();
-  }).catch(function(){
-    btn.textContent='Send Message ';btn.disabled=false;
-    formStatus('Could not send. Email directly: emonahmed.rup@gmail.com','err');
-  });
 }
 
-/* ── Inbox — owner only ── */
+/* ── Load inbox (owner only) ── */
 function loadInbox(){
+  var token=getToken();
   var list=document.getElementById('inboxList');
-  if(!list)return;
   list.innerHTML='<div class="inbox-empty">Loading...</div>';
-  jbRead(JB_BIN_MSGS).then(function(d){
-    var msgs=Array.isArray(d)?d:[];
-    msgsCache=msgs;
-    renderInbox(msgs);
-  }).catch(function(){
-    list.innerHTML='<div class="inbox-empty">Could not load messages.</div>';
+
+  /* Try GitHub first, fallback to localStorage */
+  var ghPromise=token
+    ?fetch(GH_MSG_RAW+'?nocache='+Date.now()).then(function(r){return r.status===404?[]:r.json();}).catch(function(){return[];})
+    :Promise.resolve([]);
+  var local=JSON.parse(localStorage.getItem('emon_msgs')||'[]');
+
+  ghPromise.then(function(ghMsgs){
+    /* Merge — deduplicate by id */
+    var seen={};var all=ghMsgs.concat(local).filter(function(m){return seen[m.id]?false:(seen[m.id]=true);});
+    all.sort(function(a,b){return b.id.localeCompare(a.id);});
+    renderInbox(all);
   });
 }
 
 function renderInbox(msgs){
   var list=document.getElementById('inboxList');
-  var countEl=document.getElementById('inboxCount');
-  if(countEl)countEl.textContent=msgs.length;
-  if(!msgs||!msgs.length){
-    list.innerHTML='<div class="inbox-empty">No messages yet — share your portfolio! 🎉</div>';
-    return;
-  }
-  list.innerHTML=msgs.map(function(m){
-    return '<div class="msg-card" data-id="'+m.id+'">'
+  var count=document.getElementById('inboxCount');
+  count.textContent=msgs.length;
+  if(!msgs.length){list.innerHTML='<div class="inbox-empty">No messages yet.</div>';return;}
+  list.innerHTML=msgs.map(function(m,i){
+    return '<div class="msg-card" data-idx="'+i+'">'
       +'<button class="msg-del" onclick="delMsg(this,\''+m.id+'\')">✕</button>'
       +'<div class="msg-card-top">'
       +'<span class="msg-from">'+escHtml(m.name)+'</span>'
@@ -1844,66 +1922,63 @@ function renderInbox(msgs){
 
 function toggleInbox(){
   var panel=document.getElementById('inboxPanel');
-  if(!panel)return;
   var open=panel.classList.toggle('open');
   if(open)loadInbox();
 }
 
 function delMsg(btn,id){
-  var card=btn.closest('.msg-card');
-  card.style.cssText='opacity:0;transition:all .3s;';
-  setTimeout(function(){card.remove();},300);
-  if(msgsCache){
-    msgsCache=msgsCache.filter(function(m){return m.id!==id;});
-    jbWrite(JB_BIN_MSGS,msgsCache);
-    var c=document.getElementById('inboxCount');
-    if(c)c.textContent=msgsCache.length;
-  }
-  toast('Message deleted 🗑');
+  btn.closest('.msg-card').style.cssText='opacity:0;transition:all .3s;';
+  setTimeout(function(){btn.closest('.msg-card').remove();},300);
+  /* Remove from localStorage */
+  var stored=JSON.parse(localStorage.getItem('emon_msgs')||'[]').filter(function(m){return m.id!==id;});
+  localStorage.setItem('emon_msgs',JSON.stringify(stored));
+  /* Update count */
+  var c=document.getElementById('inboxCount');
+  c.textContent=Math.max(0,(parseInt(c.textContent)||1)-1);
+  toast('Message removed');
 }
 
+/* Show inbox btn + msg dot when owner activates */
 function checkUnreadMsgs(){
-  jbRead(JB_BIN_MSGS).then(function(d){
-    var msgs=Array.isArray(d)?d:[];
-    if(msgs.length>0){
-      var dot=document.getElementById('msgDot');
-      var cnt=document.getElementById('inboxCount');
-      if(dot)dot.classList.add('show');
-      if(cnt)cnt.textContent=msgs.length;
-    }
-  }).catch(function(){});
+  var stored=JSON.parse(localStorage.getItem('emon_msgs')||'[]');
+  if(stored.length){
+    document.getElementById('msgDot').classList.add('show');
+  }
 }
-
 function delPost(btn){
   if(!isOwner)return;
   var token=getToken();
   if(!token){
     document.getElementById('tokenBar').style.display='block';
     document.getElementById('ghTokenInput').focus();
-    toast('Enter your GitHub token to delete ');
+    toast('Enter your GitHub token to delete 🔑');
     return;
   }
   var p=btn.closest('.post');
   var id=p.dataset.id;
   if(!confirm('Delete this post? This cannot be undone.'))return;
+
   syncInfo('Deleting post from GitHub...');
+
   fetchCurrentPosts(token).then(function(posts){
     var updated=posts.filter(function(d){return d.id!==id;});
     return commitPosts(updated,token,'Delete post '+id).then(function(res){
       if(!res.ok)return res.json().then(function(e){throw new Error(e.message);});
       p.style.cssText='opacity:0;transform:translateX(30px);transition:all .3s;';
       setTimeout(function(){p.remove();},300);
-      /* also clean up interactions for this post */
-      if(interCache&&interCache[id]){
-        delete interCache[id];
-        jbWrite(JB_BIN_INTER,interCache);
-      }
       syncOk('Post deleted from GitHub');
       setTimeout(function(){document.getElementById('syncBar').style.display='none';},3500);
       toast('Post deleted 🗑');
     });
-  }).catch(function(err){syncErr('Delete failed: '+err.message);});
+  }).catch(function(err){
+    syncErr('Delete failed: '+err.message);
+  });
 }
+
+/* ══════════════════════════════════════
+   CONTACT
+══════════════════════════════════════ */
+function sendMsg(){toast('Message sent! Emon will get back to you soon 📬');}
 
 /* ══════════════════════════════════════
    MOBILE NAV
