@@ -4,7 +4,7 @@
     "mood": "☕ Coffee",
     "time": "May 21, 2026 at 01:35 AM",
     "content": "Its a nice day with beautiful Sun!",
-    "likes": 1,
+    "likes": 0,
     "comments": []
   },
   {
@@ -17,6 +17,7 @@
     "id": "post_0000000000001",
     "mood": "💡 Insight",
     "time": "May 17, 2025 at 12:00 PM",
-    "content": "Finally got my Kafka → Spark → Snowflake pipeline running with under 2s end-to-end latency. The trick was tuning the microbatch interval and Snowflake connector pool size. Data engineering is mostly debugging what nobody documented 😄"
+    "content": "Finally got my Kafka → Spark → Snowflake pipeline running with under 2s end-to-end latency. The trick was tuning the microbatch interval and Snowflake connector pool size. Data engineering is mostly debugging what nobody documented 😄",
+    "likes": 0
   }
 ]
