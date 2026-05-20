@@ -1,5 +1,12 @@
 [
-  
+  {
+    "id": "post_1779320147384",
+    "mood": "☕ Coffee",
+    "time": "May 21, 2026 at 01:35 AM",
+    "content": "Its a nice day with beautiful Sun!",
+    "likes": 0,
+    "comments": []
+  },
   {
     "id": "post_1778983019436",
     "mood": "",
