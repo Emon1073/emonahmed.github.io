@@ -1526,8 +1526,9 @@ function syncInfo(msg){syncStatus('⟳ '+msg,'56,189,248');}
 /* ── Build post card HTML ── */
 function buildPostHTML(d){
   var mTag=d.mood?'<span class="pmtag">'+d.mood+'</span>':'';
-  var likes=d.likes||0;
-  var comments=d.comments||[];
+  var storedLikes=getLocalLikeCount(d.id);
+  var likes=storedLikes||(d.likes||0);
+  var comments=(d.comments||[]).concat(getLocalComments(d.id));
   var commentsHTML=comments.map(function(c){
     return '<div class="comment-item">'
       +'<div class="comment-avatar">'+escHtml(c.name.charAt(0).toUpperCase())+'</div>'
@@ -1739,6 +1740,56 @@ function restoreLikes(){
   });
 }
 
+/* ── Local fallback for visitor likes/comments when GitHub token is not available ── */
+function localCommentsKey(id){return 'post_comments_'+id;}
+function getLocalComments(id){
+  try{return JSON.parse(localStorage.getItem(localCommentsKey(id))||'[]');}
+  catch(e){return [];}
+}
+function saveLocalComment(id,comment){
+  var comments=getLocalComments(id);
+  comments.push(comment);
+  localStorage.setItem(localCommentsKey(id),JSON.stringify(comments));
+}
+function localLikeCountKey(id){return 'post_like_count_'+id;}
+function getLocalLikeCount(id){return parseInt(localStorage.getItem(localLikeCountKey(id))||'0')||0;}
+function saveLocalLikeCount(id,count){localStorage.setItem(localLikeCountKey(id),String(Math.max(0,count)));}
+
+/* ── Save a like now, then persist to posts.json if GitHub token exists ── */
+function likePost(btn){
+  var post=btn.closest('.post');
+  var id=post.dataset.id;
+  var countEl=btn.querySelector('.like-count');
+  var labelEl=btn.querySelector('.like-label');
+  var current=parseInt(countEl.textContent)||0;
+  var alreadyLiked=!!localStorage.getItem('liked_'+id);
+  var next=alreadyLiked?Math.max(0,current-1):current+1;
+
+  countEl.textContent=next;
+  labelEl.textContent=' Like'+(next===1?'':'s');
+  btn.classList.toggle('liked',!alreadyLiked);
+
+  if(alreadyLiked){localStorage.removeItem('liked_'+id);}
+  else{localStorage.setItem('liked_'+id,'1');}
+  saveLocalLikeCount(id,next);
+
+  var token=getToken();
+  if(token){
+    fetchCurrentPosts(token).then(function(posts){
+      var updated=posts.map(function(p){
+        if(p.id===id){return Object.assign({},p,{likes:next});}
+        return p;
+      });
+      return commitPosts(updated,token,(alreadyLiked?'Remove like from ':'Like post ')+id);
+    }).then(function(res){
+      if(res&&!res.ok)return res.json().then(function(e){throw new Error(e.message||'GitHub error');});
+      localStorage.removeItem(localLikeCountKey(id));
+    }).catch(function(){
+      saveLocalLikeCount(id,next);
+    });
+  }
+}
+
 /* ── Toggle comments section ── */
 function toggleComments(btn){
   var wrap=btn.closest('.post').querySelector('.comments-wrap');
@@ -1750,7 +1801,7 @@ function toggleComments(btn){
 /* ── Submit comment ── */
 function submitComment(input){
   var text=input.value.trim();
-  var nameInput=input.nextElementSibling;
+  var nameInput=input.previousElementSibling;
   var name=nameInput.value.trim()||'Anonymous';
   if(!text){input.focus();return;}
   var post=input.closest('.post');
@@ -1777,7 +1828,7 @@ function submitComment(input){
   countEl.textContent=count;
   post.querySelector('.comment-btn').lastChild.textContent=' Comment'+(count===1?'':'s');
 
-  /* Save to GitHub (everyone's comments, stored in post data) */
+  /* Save to GitHub when token exists; otherwise keep it for this visitor in localStorage */
   var token=getToken();
   if(token){
     fetchCurrentPosts(token).then(function(posts){
@@ -1789,8 +1840,14 @@ function submitComment(input){
         }
         return p;
       });
-      commitPosts(updated,token,'Add comment on post '+id);
-    }).catch(function(){/* silent fail - comment still shows */});
+      return commitPosts(updated,token,'Add comment on post '+id);
+    }).then(function(res){
+      if(res&&!res.ok)return res.json().then(function(e){throw new Error(e.message||'GitHub error');});
+    }).catch(function(){
+      saveLocalComment(id,comment);
+    });
+  } else {
+    saveLocalComment(id,comment);
   }
   toast('Comment posted 💬');
 }
