@@ -1111,6 +1111,13 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
       <div class="fg"><label>Subject</label><input id="msgSubject" type="text" placeholder="Internship, project, collab..."/></div>
       <div class="fg"><label>Message</label><textarea id="msgBody" placeholder="Tell me what you're building..." style="min-height:100px;"></textarea></div>
       <button class="btn-glow" id="sendMsgBtn" style="width:100%;border-radius:10px;" onclick="sendMsg()">Send Message 🚀</button>
+
+<button type="button"
+        onclick="resetContactForm()"
+        class="btn-outline"
+        style="width:100%;margin-top:.75rem;">
+  Reset Form
+</button>
     </div>
   </div>
   <!-- Owner inbox panel -->
@@ -2045,6 +2052,24 @@ function toggleMobile(){
   var open=nl.style.display==='flex';
   nl.style.cssText=open?'':
     'display:flex;flex-direction:column;position:fixed;top:60px;left:0;right:0;background:rgba(255,255,255,.97);padding:1.5rem 2rem;border-bottom:1px solid var(--border);z-index:99;gap:1.25rem;backdrop-filter:blur(20px);';
+}
+</script>
+
+<script>
+function resetContactForm(){
+  const form = document.querySelector('.cform form') || document.querySelector('.cform');
+  if(form && form.reset){
+    form.reset();
+  }else{
+    document.querySelectorAll('#contact input, #contact textarea').forEach(el=>el.value='');
+  }
+
+  const toastEl = document.getElementById('toast');
+  if(toastEl){
+    toastEl.innerHTML = '<span class="ti">✓</span>Form reset';
+    toastEl.classList.add('show');
+    setTimeout(()=>toastEl.classList.remove('show'),2000);
+  }
 }
 </script>
 </body>
