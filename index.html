@@ -754,7 +754,7 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
     <div class="about-right">
       <p class="sec-label">About Me</p>
       <h2 class="sec-title">Building the backbone of<br>data-driven decisions</h2>
-      <!-- ✏️ OWNER: Edit paragraphs below directly in this HTML file -->
+      <!--  OWNER: Edit paragraphs below directly in this HTML file -->
       <p class="about-p">I'm <strong>Emon Ahmed</strong>, a Computer Science student specialising in Data Engineering. I design systems that move, transform, and store data reliably at scale — from raw ingestion all the way to BI dashboards.</p>
       <p class="about-p">I've worked across the full data pipeline stack: batch ETL, real-time Kafka streams, cloud warehouses, and orchestration with Airflow. I care deeply about data quality, pipeline observability, and systems that are genuinely maintainable in production.</p>
       <p class="about-p"><strong>Currently exploring:</strong> Apache Spark optimisation, dbt best practices, Snowflake architecture, and distributed systems design patterns.</p>
@@ -785,7 +785,7 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
 </section>
 
 <!-- ════════ CV / EXPERIENCE ════════ -->
-<!-- ✏️ OWNER: Edit ALL CV content directly in this HTML section below -->
+<!--  OWNER: Edit ALL CV content directly in this HTML section below -->
 <section id="cv">
   <div class="reveal">
     <p class="sec-label">Resume</p>
@@ -798,7 +798,7 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
     <div class="cv-col">
       <h3>Experience</h3>
 
-      <!-- ✏️ Edit each cv-item to match your real experience -->
+      <!--  Edit each cv-item to match your real experience -->
       <div class="cv-item">
         <div class="cv-item-title">Data Engineering Intern</div>
         <div class="cv-item-org">Acme Analytics Ltd.</div>
@@ -1048,12 +1048,12 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
     </div>
     <div class="compose-foot">
       <div class="mood-row">
-        <button class="mood-btn" onclick="pickMood(this,'😄 Happy')">😄 Happy</button>
-        <button class="mood-btn" onclick="pickMood(this,'🤔 Thinking')">🤔 Thinking</button>
-        <button class="mood-btn" onclick="pickMood(this,'💡 Insight')">💡 Insight</button>
-        <button class="mood-btn" onclick="pickMood(this,'😤 Grind')">😤 Grind</button>
-        <button class="mood-btn" onclick="pickMood(this,'🎉 Win')">🎉 Win</button>
-        <button class="mood-btn" onclick="pickMood(this,'☕ Coffee')">☕ Coffee</button>
+        <button class="mood-btn" onclick="pickMood(this,' Happy')"> Happy</button>
+        <button class="mood-btn" onclick="pickMood(this,' Thinking')"> Thinking</button>
+        <button class="mood-btn" onclick="pickMood(this,' Insight')"> Insight</button>
+        <button class="mood-btn" onclick="pickMood(this,' Grind')"> Grind</button>
+        <button class="mood-btn" onclick="pickMood(this,' Win')"> Win</button>
+        <button class="mood-btn" onclick="pickMood(this,' Coffee')"> Coffee</button>
       </div>
       <div style="display:flex;gap:.5rem;align-items:center;">
         <!-- Photo attach button -->
@@ -1110,7 +1110,7 @@ footer p{font-size:.78rem;color:rgba(255,255,255,.45);}
       <div class="fg"><label>Email</label><input id="msgEmail" type="email" placeholder="your@email.com"/></div>
       <div class="fg"><label>Subject</label><input id="msgSubject" type="text" placeholder="Internship, project, collab..."/></div>
       <div class="fg"><label>Message</label><textarea id="msgBody" placeholder="Tell me what you're building..." style="min-height:100px;"></textarea></div>
-      <button class="btn-glow" id="sendMsgBtn" style="width:100%;border-radius:10px;" onclick="sendMsg()">Send Message 🚀</button>
+      <button class="btn-glow" id="sendMsgBtn" style="width:100%;border-radius:10px;" onclick="sendMsg()">Send Message </button>
 
 <button type="button"
         onclick="resetContactForm()"
@@ -1492,7 +1492,7 @@ function uploadToCloudinary(file,onSuccess,onError){
   fd.append('file',file);
   fd.append('upload_preset',CL_PRESET);
   fd.append('folder','emon-portfolio');
-  toast('Uploading image... ⏳');
+  toast('Uploading image... ');
   fetch(CL_URL,{method:'POST',body:fd})
     .then(function(r){return r.json();})
     .then(function(d){
@@ -1509,7 +1509,7 @@ function saveToken(){
   if(!t){toast('Paste your token first!');return;}
   sessionStorage.setItem('gh_token',t);
   document.getElementById('tokenBar').style.display='none';
-  toast('Token saved 🔑 — you can now post!');
+  toast('Token saved  — you can now post!');
   if(window._pendingPost){window._pendingPost=false;submitPost();}
 }
 document.addEventListener('DOMContentLoaded',function(){
@@ -1706,7 +1706,7 @@ function submitPost(){
         document.querySelectorAll('.pdel').forEach(function(e){e.classList.add('owner-visible');});
         syncOk('Post published! Visible to everyone ✓');
         setTimeout(function(){document.getElementById('syncBar').style.display='none';},4000);
-        toast('Post published 🚀');
+        toast('Post published ');
       });
     }).catch(function(err){
       syncErr('Failed: '+err.message);
